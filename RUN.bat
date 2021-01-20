@@ -1,11 +1,13 @@
 @echo off
-@setlocal enableextensions
-@cd /d "%~dp0"
+pushd %~dp0
+
+set "exe=%cd%\exe\"
+set "src=%cd%\src\"
 
 echo Updating UI
-pyuic5 ui.ui -o ui.py
+pyuic5 "%exe%ui.ui" -o "%src%ui.py"
 
 echo Running script
-python elmocut.py
+python "%src%elmocut.py"
 
 pause

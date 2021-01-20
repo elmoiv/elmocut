@@ -1,5 +1,5 @@
 qdarkstyle==2.8.1
+pyperclip==1.8.0
 PyQt5==5.14.2
 scapy==2.4.4
-pyperclip
-manuf
+manuf==1.1.1
