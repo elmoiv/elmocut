@@ -4,7 +4,7 @@ from os import system as webbrowser
 from qdarkstyle import load_stylesheet
 from pyperclip import copy
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QMessageBox as QMsg
 from PyQt5.QtCore import Qt, QPropertyAnimation
 from PyQt5.QtGui import QColor, QPixmap, QIcon
 
@@ -25,9 +25,9 @@ from ui import Ui_MainWindow
 CONNECTED = True
 
 def check_connection(func):
-    '''
+    """
     Connection checker decorator
-    '''
+    """
     def wrapper(*args, **kargs):
         # for def func(self): in class
         # will return kargs = {}
@@ -88,9 +88,9 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
     @staticmethod
     def processIcon(icon_data):
-        '''
+        """
         Create icon pixmap object from raw data
-        '''
+        """
         pix = QPixmap()
         icon = QIcon()
         
@@ -103,35 +103,35 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         QApplication.processEvents()
 
     def resizeEvent(self, event=True):
-        '''
+        """
         Auto resize table widget columns dynamically
-        '''
+        """
         for i in range(4):
             self.tableScan.setColumnWidth(i, self.tableScan.width() // 4)
 
     def closeEvent(self, event):
-        '''
+        """
         Unkill any killed device on exit event
-        '''
+        """
         self.killer.unkill_all()
     
     def coloredItem(self, elmnt, colors):
-        '''
+        """
         Add colors to Table rows
-        '''
+        """
         elmnt.setBackground(QColor(colors[0]))
         elmnt.setForeground(QColor(colors[1]))
     
     def log(self, text, color='white'):
-        '''
+        """
         Print log info at left label
-        '''
+        """
         self.lblleft.setText(f"<font color='{color}'>{text}</font>")
     
     def connected(self):
-        '''
+        """
         Check for Internet connection
-        '''
+        """
         globals()['CONNECTED'] = True
 
         if not is_connected():
@@ -146,9 +146,9 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         return self.scanner.devices[self.tableScan.currentRow()]
     
     def reListDevices(self):
-        '''
+        """
         View scanlist devices with correct colors processed
-        '''
+        """
         self.tableScan.clearSelection()
         
         # Clearing QTableWidget
@@ -184,9 +184,9 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.lblcenter.setText('Nothing Selected')
     
     def cellClicked(self, row, column):
-        '''
+        """
         Copy selected cell data to clipboard
-        '''
+        """
         # Get current row
         device = self.current_index()
 
@@ -196,9 +196,9 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.lblcenter.setText(cell)
 
     def deviceClicked(self):
-        '''
+        """
         Disable kill, unkill buttons when admins are selected
-        '''
+        """
         device = self.current_index()
         
         is_admin = device['type'] not in 'RouterMe'
@@ -208,9 +208,9 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
     @check_connection
     def kill(self):
-        '''
+        """
         Apply ARP spoofing to selected device
-        '''
+        """
         if not self.tableScan.selectedItems():
             self.log('No device selected.', 'aqua')
             return
@@ -229,9 +229,9 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
     
     @check_connection
     def unkill(self):
-        '''
+        """
         Disable ARP spoofing on previously spoofed devices
-        '''
+        """
         if not self.tableScan.selectedItems():
             self.log('No device selected.', 'aqua')
             return
@@ -250,27 +250,27 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
     
     @check_connection
     def killAll(self):
-        '''
+        """
         Kill all scanned devices except admins
-        '''
+        """
         self.killer.kill_all(self.scanner.devices)
         self.reListDevices()
         self.log('Killed All devices.')
     
     @check_connection
     def unkillAll(self):
-        '''
+        """
         Unkill all killed devices except admins
-        '''
+        """
         self.killer.unkill_all()
         self.reListDevices()
         
         self.log('Unkilled All devices.')
 
     def process_devices(self):
-        '''
+        """
         Perform scan on devices connected to same access point
-        '''
+        """
         self.tableScan.clearSelection()
         
         # first device in list is the router
@@ -291,26 +291,22 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         )
     
     def scanEasy(self):
-        '''
+        """
         Easy Scan button connector
-        '''
+        """
         self.ScanThread_Starter()
     
     def scanHard(self):
-        '''
+        """
         Hard Scan button connector
-        '''
+        """
         # Set correct max for progress bar
-        self.pgbar.setMaximum(self.scanner.device_count)
-        self.pgbar.setValue(0)
-        self.pgbar.setVisible(True)
-
         self.ScanThread_Starter(scan_type=1)
     
     def ScanThread_Starter(self, scan_type=0):
-        '''
+        """
         self.scan_thread QThread Starter
-        '''
+        """
         if not self.connected():
             return
         
@@ -327,14 +323,20 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             ['aqua', 'fuchsia'][scan_type]
         )
         
+        self.pgbar.setMaximum(self.scanner.device_count)
+        self.pgbar.setVisible(True)
+        self.pgbar.setValue(self.scanner.device_count * (not scan_type))
+
+        self.run()
+        
         self.scan_thread.scanner = self.scanner
         self.scan_thread.scan_type = scan_type
         self.scan_thread.start()
 
     def ScanThread_Reciever(self, process_devices_func):
-        '''
+        """
         self.scan_thread QThread results reciever
-        '''
+        """
         self.centralwidget.setEnabled(True)
         self.process_devices()
         self.pgbar.setVisible(False)
@@ -348,13 +350,15 @@ if __name__ == "__main__":
     
     # Check if Npcap is installed
     if not npcap_exists():
-        msg_box(
+        m = msg_box(
             'elmoCut',
             'Npcap is not installed on your machine!' \
-            '\nClick Ok to download.',
-            icon
+            '\n\nClick Ok to download.',
+            icon,
+            QMsg.Ok | QMsg.Cancel
         )
-        webbrowser('start "" "https://nmap.org/npcap/dist/npcap-1.10.exe"')
+        if m == 1024:
+            webbrowser('start "" "https://nmap.org/npcap/dist/npcap-1.10.exe"')
     
     # Check if another elmoCut process is running
     elif duplicate_elmocut():

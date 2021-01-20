@@ -26,10 +26,11 @@ class ScanThread(QThread):
         self.thread_finished_signal.emit(True)
     
     def easy(self):
-        self.scanner.scan()
+        # Fake progress cause Scapy can't handle QThread Signals
+        self.scanner.arp_scan()
     
     def hard(self):
-        self.scanner.threaded_pinging()
-        # self.pinging_watcher() will use progress signal to update progress bar in GUI
-        self.scanner.pinging_watcher(self.progress.emit)
+        # self.pinging_watcher() will use progress signal
+        # to update progress bar in GUI
+        self.scanner.ping_scan(self.progress.emit)
         self.scanner.arping_cache()

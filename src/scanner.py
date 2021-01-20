@@ -1,28 +1,30 @@
 from utils import get_vendor, good_mac, get_my_ip, threaded
-from pinger import Pinger
 from scapy.all import Ether, arping, conf, get_if_addr
 from os import system, popen
+from time import sleep
 from re import findall
 
-class Scanner(Pinger):
+class Scanner():
     def __init__(self):
-        super().__init__()
+        self.device_count = 24
         self.devices = []
+        self.__ping_done = 0
+        self.ips = []
         self.old_ips = {}
         self.router = {}
         self.me = {}
     
     def init(self):
-        '''
+        """
         Intializing Scanner
-        '''
+        """
         self.router_ip = conf.route.route("0.0.0.0")[2]
         self.router_mac = 'FF:FF:FF:FF:FF:FF'
 
         self.my_ip = get_my_ip()
         self.my_mac = good_mac(Ether().src)
         
-        self.IPs = [
+        self.ips = [
             f'{self.router_ip.rsplit(".", 1)[0]}.{i}'
                 for i in range(self.device_count)
         ]
@@ -31,15 +33,15 @@ class Scanner(Pinger):
         self.add_router()
     
     def flush_arp(self):
-        '''
+        """
         Flush ARP cache
-        '''
+        """
         system('arp -d *')
 
     def add_me(self):
-        '''
+        """
         Get My info and append to self.devices
-        '''
+        """
         self.me = {
             'ip': self.my_ip,
             'mac': self.my_mac,
@@ -50,9 +52,9 @@ class Scanner(Pinger):
         self.devices.insert(0, self.me)
 
     def add_router(self):
-        '''
+        """
         Get Gateway info and append to self.devices
-        '''
+        """
         self.router = {
             'ip': self.router_ip,
             'mac': good_mac(self.router_mac),
@@ -63,9 +65,9 @@ class Scanner(Pinger):
         self.devices.insert(0, self.router)
 
     def devices_appender(self, scan_result):
-        '''
+        """
         Append scan results to self.devices
-        '''
+        """
         self.devices = []
         unique = []
 
@@ -110,25 +112,51 @@ class Scanner(Pinger):
         # Clear arp cache to avoid duplicates next time
         if unique:
             self.flush_arp()
-
-    def scan(self):
-        '''
-        Scan using Scapy arping method 
-        '''
-        self.init()
-
-        scan_result = arping(f"{self.router_ip}/24", verbose=0)
-        clean_result = [(i[1].psrc, i[1].src) for i in scan_result[0]]
-        
-        self.devices_appender(clean_result)
     
     def arping_cache(self):
-        '''
+        """
         Showing system arp cache after pinging
-        '''
+        """
         self.init()
 
         scan_result = popen('arp -a').read()
         clean_result = findall(r'([0-9.]+)\s+([0-9a-f-]+)\s+dynamic', scan_result)
         
         self.devices_appender(clean_result)
+    
+    def arp_scan(self):
+        """
+        Scan using Scapy arping method 
+        """
+        self.init()
+
+        scan_result = arping(f"{self.router_ip}/24", verbose=0, timeout=1)
+        clean_result = [(i[1].psrc, i[1].src) for i in scan_result[0]]
+
+        self.devices_appender(clean_result)
+
+    def ping_scan(self, qt_prgoress_signal=bool):
+        """
+        Ping all devices at once [CPU Killing function]
+           (All Threads will run at the same tine)
+        """
+        self.__ping_done = 0
+        
+        for ip in self.ips:
+            self.ping_thread(ip)
+        
+        while self.__ping_done < self.device_count:
+            # Add a sleep to overcome High CPU usage
+            sleep(.01)
+            qt_prgoress_signal(self.__ping_done)
+        
+        return True
+    
+    @threaded
+    def ping_thread(self, ip):
+        """
+        Sub function for pinging
+        """
+        # Workaround for no verbose commands
+        _ = popen(f'ping -n 1 {ip}').read()
+        self.__ping_done += 1

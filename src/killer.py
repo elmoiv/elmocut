@@ -17,9 +17,9 @@ class Killer:
 
     @threaded
     def kill(self, victim, wait_after=1):
-        '''
+        """
         Spoofing victim
-        '''
+        """
         self.killed[victim['mac']] = victim
 
         # Cheat Victim
@@ -50,9 +50,9 @@ class Killer:
 
     @threaded
     def unkill(self, victim):
-        '''
+        """
         Unspoofing victim
-        '''
+        """
         self.killed.pop(victim['mac'])
 
         # Fix Victim
@@ -78,9 +78,9 @@ class Killer:
         send(to_router, verbose=0)
 
     def kill_all(self, device_list):
-        '''
+        """
         Safely kill all devices
-        '''
+        """
         for device in device_list[:]:
             if device['type'] in 'RouterMe':
                 continue
@@ -88,28 +88,28 @@ class Killer:
                 self.kill(device)
 
     def unkill_all(self):
-        '''
+        """
         Safely unkill all devices killed previously
-        '''
+        """
         for mac in dict(self.killed):
             self.killed.pop(mac)
     
     def store(self):
-        '''
+        """
         Save a copy of previously killed devices
-        '''
+        """
         self.storage = dict(self.killed)
     
     def release(self):
-        '''
+        """
         Remove the stored copy of killed devices
-        '''
+        """
         self.storage = {}
     
     def rekill_stored(self, new_devices):
-        '''
+        """
         Re-kill old devices in self.storage
-        '''
+        """
         for mac, old in self.storage.items():
             for new in new_devices:
                 # Update old killed with newer ip
