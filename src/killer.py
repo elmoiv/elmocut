@@ -6,7 +6,8 @@ dummy_router = {
     'ip': '192.168.1.1',
     'mac': 'FF:FF:FF:FF:FF:FF',
     'vendor': 'NONE',
-    'type': 'Router'
+    'type': 'Router',
+    'admin': True
 }
 
 class Killer:
@@ -82,7 +83,7 @@ class Killer:
         Safely kill all devices
         """
         for device in device_list[:]:
-            if device['type'] in 'RouterMe':
+            if device['admin']:
                 continue
             if device['mac'] not in self.killed:
                 self.kill(device)

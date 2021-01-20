@@ -7,11 +7,11 @@ from re import findall
 class Scanner():
     def __init__(self):
         self.device_count = 24
-        self.devices = []
         self.__ping_done = 0
-        self.ips = []
+        self.devices = []
         self.old_ips = {}
         self.router = {}
+        self.ips = []
         self.me = {}
     
     def init(self):
@@ -46,7 +46,8 @@ class Scanner():
             'ip': self.my_ip,
             'mac': self.my_mac,
             'vendor': get_vendor(self.my_mac),
-            'type': 'Me'
+            'type': 'Me',
+            'admin': True
         }
         
         self.devices.insert(0, self.me)
@@ -59,7 +60,8 @@ class Scanner():
             'ip': self.router_ip,
             'mac': good_mac(self.router_mac),
             'vendor': get_vendor(self.router_mac),
-            'type': 'Router'
+            'type': 'Router',
+            'admin': True
         }
 
         self.devices.insert(0, self.router)
@@ -93,7 +95,8 @@ class Scanner():
                     'ip':     ip,
                     'mac':    good_mac(mac),
                     'vendor': get_vendor(mac),
-                    'type':   'User'
+                    'type':   'User',
+                    'admin': False
                 }
             )
         
