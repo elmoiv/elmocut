@@ -29,6 +29,19 @@ def good_mac(mac):
     """
     return mac.upper().replace('-', ':')
 
+def is_connected():
+    """
+    Check if interface is connected to router
+    """
+    # Checks if there are any IPs in Default Gateway sections
+    # We only need to make sure we are connected to router
+    output = popen(
+        'ipconfig | findstr "Default Gateway"'
+        ).read().replace('.', '')
+    return bool([i for i in output if i.isdigit()])
+
+# Old method solves the problem but at the cost of performance
+'''
 def is_connected(host="8.8.8.8", port=53, timeout=3):
     """
     Check if connected to internet
@@ -41,7 +54,7 @@ def is_connected(host="8.8.8.8", port=53, timeout=3):
             ).connect((host, port))
     except socket.error:
         return False
-    return True
+    return True'''
 
 def get_my_ip():
     """

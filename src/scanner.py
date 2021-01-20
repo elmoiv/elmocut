@@ -43,11 +43,11 @@ class Scanner():
         Get My info and append to self.devices
         """
         self.me = {
-            'ip': self.my_ip,
-            'mac': self.my_mac,
-            'vendor': get_vendor(self.my_mac),
-            'type': 'Me',
-            'admin': True
+            'ip':       self.my_ip,
+            'mac':      self.my_mac,
+            'vendor':   get_vendor(self.my_mac),
+            'type':     'Me',
+            'admin':    True
         }
         
         self.devices.insert(0, self.me)
@@ -57,11 +57,11 @@ class Scanner():
         Get Gateway info and append to self.devices
         """
         self.router = {
-            'ip': self.router_ip,
-            'mac': good_mac(self.router_mac),
-            'vendor': get_vendor(self.router_mac),
-            'type': 'Router',
-            'admin': True
+            'ip':       self.router_ip,
+            'mac':      good_mac(self.router_mac),
+            'vendor':   get_vendor(self.router_mac),
+            'type':     'Router',
+            'admin':    True
         }
 
         self.devices.insert(0, self.router)
@@ -73,7 +73,13 @@ class Scanner():
         self.devices = []
         unique = []
 
-        for ip, mac in sorted(set(scan_result)):
+        # Sort by last part of ip xxx.xxx.x.y
+        scan_result = sorted(
+            scan_result,
+            key=lambda i:int(i[0].split('.')[-1])
+        )
+        
+        for ip, mac in scan_result:
             mac = good_mac(mac)
 
             # Store gateway
@@ -96,7 +102,7 @@ class Scanner():
                     'mac':    good_mac(mac),
                     'vendor': get_vendor(mac),
                     'type':   'User',
-                    'admin': False
+                    'admin':  False
                 }
             )
         
