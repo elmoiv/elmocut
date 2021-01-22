@@ -1,9 +1,7 @@
-from win32gui import EnumWindows, GetWindowText, ShowWindow
 from threading import Thread
-from os import popen, path
+from os import popen, system
 from scapy.all import conf
 from manuf import manuf
-import socket
 
 p = manuf.MacParser()
 
@@ -40,22 +38,6 @@ def is_connected():
         ).read().replace('.', '')
     return bool([i for i in output if i.isdigit()])
 
-# Old method solves the problem but at the cost of performance
-'''
-def is_connected(host="8.8.8.8", port=53, timeout=3):
-    """
-    Check if connected to internet
-    """
-    try:
-        socket.setdefaulttimeout(timeout)
-        socket.socket(
-            socket.AF_INET,
-            socket.SOCK_STREAM
-            ).connect((host, port))
-    except socket.error:
-        return False
-    return True'''
-
 def get_my_ip():
     """
     Try to extract ip of this device
@@ -63,38 +45,8 @@ def get_my_ip():
     """
     try:
         return [x[4] for x in conf.route.routes if x[2] != '0.0.0.0'][0]
-    except:
+    except IndexError:
         return '127.0.0.1'
 
-def npcap_exists():
-    """
-    Check for Npcap driver
-    """
-    return path.exists(r'C:\Windows\SysWOW64\Npcap')
-
-def duplicate_elmocut():
-    """
-    Check if there is more than 1 instance of elmoCut.exe
-    """
-    tasklist = popen('tasklist').read()
-    return tasklist.lower().count('elmocut.exe') > 1
-
-def bring_elmocut_tofront():
-    # Inspired from:
-    # https://github.com/iwalton3/plex-mpv-shim/blob/master/plex_mpv_shim/win_utils.py
-    """
-    Bring elmoCut window to front
-    """
-    top_windows = {}
-    
-    # Get all windows with and store hwnd in dict
-    def window_enumeration_handler(hwnd, top_windows):
-        top_windows[GetWindowText(hwnd).lower()] = hwnd
-    EnumWindows(window_enumeration_handler, top_windows)
-    
-    # Detect elmocut
-    elmocut_gui = top_windows['elmocut']
-    
-    # Bring window to front
-    ShowWindow(elmocut_gui, 6) # Minimize
-    ShowWindow(elmocut_gui, 9) # Un-minimize
+def goto(url):
+    system(f'start "" "{url}"')

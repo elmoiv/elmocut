@@ -13,6 +13,8 @@ class Scanner():
         self.router = {}
         self.ips = []
         self.me = {}
+        self.qt_progress_signal = int
+        self.qt_log_signal = print
     
     def init(self):
         """
@@ -144,11 +146,13 @@ class Scanner():
 
         self.devices_appender(clean_result)
 
-    def ping_scan(self, qt_prgoress_signal=bool):
+    def ping_scan(self):
         """
         Ping all devices at once [CPU Killing function]
            (All Threads will run at the same tine)
         """
+        self.init()
+        
         self.__ping_done = 0
         
         for ip in self.ips:
@@ -157,7 +161,7 @@ class Scanner():
         while self.__ping_done < self.device_count:
             # Add a sleep to overcome High CPU usage
             sleep(.01)
-            qt_prgoress_signal(self.__ping_done)
+            self.qt_progress_signal(self.__ping_done)
         
         return True
     
