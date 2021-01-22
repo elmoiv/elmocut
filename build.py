@@ -16,7 +16,7 @@ VSVersionInfo(
       StringTable(
         u'040904B0',
         [StringStruct(u'CompanyName', u'elmoiv Apps'),
-        StringStruct(u'FileDescription', u'elmoCut lets you spoof everyone on your network'),
+        StringStruct(u'FileDescription', u'elmoCut'),
         StringStruct(u'FileVersion', u'{0}'),
         StringStruct(u'InternalName', u'elmocut'),
         StringStruct(u'LegalCopyright', u'Khaled El-Morshedy (elmoiv) 2015-2021'),
@@ -106,7 +106,7 @@ WizardStyle=modern
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{{cm:CreateDesktopIcon}}"; GroupDescription: "{{cm:AdditionalIcons}}"; Flags: unchecked
+Name: "desktopicon"; Description: "{{cm:CreateDesktopIcon}}"; GroupDescription: "{{cm:AdditionalIcons}}"
 Name: "quicklaunchicon"; Description: "{{cm:CreateQuickLaunchIcon}}"; GroupDescription: "{{cm:AdditionalIcons}}"; Flags: unchecked; OnlyBelowVersion: 6.1; Check: not IsAdminInstallMode
 
 [Files]
@@ -146,8 +146,8 @@ excluded_upx = ['qwindows.dll', 'qsvgicon.dll', 'qxdgdesktopportal.dll', 'qwindo
 
 excluded_modules = ['tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'PIL', 'tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'matplotlib', 'IPython', 'scipy', 'eel', 'cryptography', 'jedi', 'win32com', 'numpy', 'wcwidth', 'win32wnet', 'unicodedata', '_asyncio', '_bz2', '_decimal', '_hashlib', '_lzma', '_multiprocessing', '_overlapped', '_win32sysloader', '_ssl']
 
-is_gui = True
-version = '0.1'
+is_gui = not bool(input('Press Enter for GUI, or anything for Console: '))
+version = '0.2'
 
 import os, shutil, time
 
@@ -189,8 +189,8 @@ open('tmp.iss', 'w').write(iss_file)
 
 start = time.time()
 
-print('>>> Running PyInstaller')
-os.system('pyinstaller tmp.spec --log-level "ERROR"')
+print('>>> [PyInstaller] Converting project to exe')
+os.system('pyinstaller tmp.spec --log-level "ERROR" --noconfirm')
 
 app_path = 'output\\elmocut\\'
 platforms_dlls = app_path + 'PyQt5\\Qt\\plugins\\platforms\\'
@@ -216,7 +216,7 @@ for dll in os.listdir(platforms_dlls):
 for rm in ['dist', 'build', app_path + 'PyQt5\\Qt\\translations', app_path + 'PyQt5\\Qt\\plugins\\imageformats']:
     shutil.rmtree(rm)
 
-print('>>> Compiling Setup file')
+print('>>> [Inno Setup] Packaging exe inised Setup file')
 # Compile ISS inno setup script
 _ = os.popen('iscc tmp.iss').read()
 
