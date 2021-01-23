@@ -13,6 +13,7 @@ class Scanner():
         self.router = {}
         self.ips = []
         self.me = {}
+        self.perfix = None
         self.qt_progress_signal = int
         self.qt_log_signal = print
     
@@ -26,10 +27,8 @@ class Scanner():
         self.my_ip = get_my_ip()
         self.my_mac = good_mac(Ether().src)
         
-        self.ips = [
-            f'{self.router_ip.rsplit(".", 1)[0]}.{i}'
-                for i in range(self.device_count)
-        ]
+        self.perfix = self.router_ip.rsplit(".", 1)[0]
+        self.ips = [f'{self.perfix}.{i}' for i in range(1, self.device_count)]
 
         self.add_me()
         self.add_router()
@@ -131,7 +130,7 @@ class Scanner():
         self.init()
 
         scan_result = popen('arp -a').read()
-        clean_result = findall(r'([0-9.]+)\s+([0-9a-f-]+)\s+dynamic', scan_result)
+        clean_result = findall(rf'({self.perfix}\.\d+)\s+([0-9a-f-]+)\s+dynamic', scan_result)
         
         self.devices_appender(clean_result)
     
@@ -158,7 +157,7 @@ class Scanner():
         for ip in self.ips:
             self.ping_thread(ip)
         
-        while self.__ping_done < self.device_count:
+        while self.__ping_done < self.device_count - 1:
             # Add a sleep to overcome High CPU usage
             sleep(.01)
             self.qt_progress_signal(self.__ping_done)

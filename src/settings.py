@@ -38,8 +38,13 @@ class Settings(QMainWindow, Ui_MainWindow):
         else:
             remove_from_startup()
 
-        killed = get_settings('killed')
-        export_settings([is_dark, count, is_autostart, is_minimized, is_remember, killed])
+        # Make sure that real-time killed devices are included
+        # If its user's first time to apply remember option
+        killed_from_json = get_settings('killed')
+        killed_from_elmo = list(self.elmocut.killer.killed)
+        killed_all = list(set(killed_from_json + killed_from_elmo)) * is_remember
+
+        export_settings([is_dark, count, is_autostart, is_minimized, is_remember, killed_all])
 
         self.updateElmocutSettings()
 

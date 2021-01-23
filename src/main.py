@@ -374,7 +374,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         # re-kill paused and update to current devices
         self.killer.rekill_stored(self.scanner.devices)
         for rem_device in self.scanner.devices:
-            if rem_device['mac'] in get_settings('killed'):
+            if rem_device['mac'] in get_settings('killed') * self.remember:
                 self.killer.kill(rem_device)
 
         # clear old database
