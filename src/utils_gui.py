@@ -1,6 +1,7 @@
 from win32gui import EnumWindows, GetWindowText, ShowWindow
-from os import popen, path, makedirs, environ
+from os import path, makedirs, environ
 from json import dump, load
+from utils import terminal
 import ctypes
 import winreg
 
@@ -23,7 +24,7 @@ def duplicate_elmocut():
     """
     Check if there is more than 1 instance of elmoCut.exe
     """
-    tasklist = popen('tasklist').read()
+    tasklist = terminal('tasklist')
     return tasklist.lower().count('elmocut.exe') > 1
 
 def bring_elmocut_tofront():

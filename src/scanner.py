@@ -1,6 +1,5 @@
-from utils import get_vendor, good_mac, get_my_ip, threaded
+from utils import get_vendor, good_mac, get_my_ip, threaded, terminal
 from scapy.all import Ether, arping, conf, get_if_addr
-from os import system, popen
 from time import sleep
 from re import findall
 
@@ -37,7 +36,7 @@ class Scanner():
         """
         Flush ARP cache
         """
-        system('arp -d *')
+        terminal('arp -d *', decode=False)
 
     def add_me(self):
         """
@@ -129,7 +128,7 @@ class Scanner():
         """
         self.init()
 
-        scan_result = popen('arp -a').read()
+        scan_result = terminal('arp -a')
         clean_result = findall(rf'({self.perfix}\.\d+)\s+([0-9a-f-]+)\s+dynamic', scan_result)
         
         self.devices_appender(clean_result)
@@ -169,6 +168,5 @@ class Scanner():
         """
         Sub function for pinging
         """
-        # Workaround for no verbose commands
-        _ = popen(f'ping -n 1 {ip}').read()
+        terminal(f'ping -n 1 {ip}', decode=False)
         self.__ping_done += 1

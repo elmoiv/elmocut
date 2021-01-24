@@ -1,9 +1,19 @@
+from subprocess import check_output, CalledProcessError
 from threading import Thread
-from os import popen, system
 from scapy.all import conf
 from manuf import manuf
 
 p = manuf.MacParser()
+
+def terminal(command, shell=True, decode=True):
+    """
+    Terminal commands via Subprocess
+    """
+    try:
+        cmd = check_output(command, shell=shell)
+        return cmd.decode() if decode else None
+    except CalledProcessError:
+        return None
 
 def threaded(fn):
     """
@@ -33,9 +43,7 @@ def is_connected():
     """
     # Checks if there are any IPs in Default Gateway sections
     # We only need to make sure we are connected to router
-    output = popen(
-        'ipconfig | findstr "Default Gateway"'
-        ).read().replace('.', '')
+    output = terminal('ipconfig | findstr "Default Gateway"')
     return bool([i for i in output if i.isdigit()])
 
 def get_my_ip():
@@ -49,4 +57,4 @@ def get_my_ip():
         return '127.0.0.1'
 
 def goto(url):
-    system(f'start "" "{url}"')
+    terminal(f'start "" "{url}"', True)
