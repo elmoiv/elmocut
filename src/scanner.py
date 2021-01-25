@@ -3,9 +3,11 @@ from scapy.all import Ether, arping, conf, get_if_addr
 from time import sleep
 from re import findall
 
+from constants import *
+
 class Scanner():
     def __init__(self):
-        self.device_count = 24
+        self.device_count = 25
         self.__ping_done = 0
         self.devices = []
         self.old_ips = {}
@@ -16,18 +18,21 @@ class Scanner():
         self.qt_progress_signal = int
         self.qt_log_signal = print
     
+    def generate_ips(self):
+        self.ips = [f'{self.perfix}.{i}' for i in range(1, self.device_count)]
+
     def init(self):
         """
         Intializing Scanner
         """
         self.router_ip = conf.route.route("0.0.0.0")[2]
-        self.router_mac = 'FF:FF:FF:FF:FF:FF'
+        self.router_mac = GLOBAL_MAC
 
         self.my_ip = get_my_ip()
         self.my_mac = good_mac(Ether().src)
         
         self.perfix = self.router_ip.rsplit(".", 1)[0]
-        self.ips = [f'{self.perfix}.{i}' for i in range(1, self.device_count)]
+        self.generate_ips()
 
         self.add_me()
         self.add_router()
@@ -126,8 +131,6 @@ class Scanner():
         """
         Showing system arp cache after pinging
         """
-        self.init()
-
         scan_result = terminal('arp -a')
         clean_result = findall(rf'({self.perfix}\.\d+)\s+([0-9a-f-]+)\s+dynamic', scan_result)
         
@@ -137,8 +140,10 @@ class Scanner():
         """
         Scan using Scapy arping method 
         """
-        self.init()
+        if self.router_mac and self.router_mac == GLOBAL_MAC:
+            self.init()
 
+        self.generate_ips()
         scan_result = arping(f"{self.router_ip}/24", verbose=0, timeout=1)
         clean_result = [(i[1].psrc, i[1].src) for i in scan_result[0]]
 
@@ -149,10 +154,12 @@ class Scanner():
         Ping all devices at once [CPU Killing function]
            (All Threads will run at the same tine)
         """
-        self.init()
-        
         self.__ping_done = 0
+
+        if self.router_mac and self.router_mac == GLOBAL_MAC:
+            self.init()
         
+        self.generate_ips()
         for ip in self.ips:
             self.ping_thread(ip)
         

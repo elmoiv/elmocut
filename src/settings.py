@@ -1,9 +1,10 @@
 from utils_gui import import_settings, export_settings, get_settings, \
                       is_admin, add_to_startup, remove_from_startup
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QMainWindow
 from qdarkstyle import load_stylesheet
 from ui_settings import Ui_MainWindow
 from qtools import MsgType, Buttons
+from utils import goto
 
 class Settings(QMainWindow, Ui_MainWindow):
     def __init__(self, elmocut, icon):
@@ -23,6 +24,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.spinCount.valueChanged.connect(self.sliderCount.setValue)
         self.btnApply.clicked.connect(self.Apply)
         self.btnDefaults.clicked.connect(self.Defaults)
+        self.btnUpdate.clicked.connect(lambda self: goto('https://github.com/elmoiv/elmocut/releases/latest'))
 
     def Apply(self):
         exe_path = '\\'.join(__file__.split('\\')[:-1] + ['elmocut.exe'])
@@ -47,6 +49,12 @@ class Settings(QMainWindow, Ui_MainWindow):
         export_settings([is_dark, count, is_autostart, is_minimized, is_remember, killed_all])
 
         self.updateElmocutSettings()
+
+        MsgType.INFO(
+            self,
+            'Apply Settings',
+            'New settings have been applied.'
+        )
 
     def Defaults(self):
         if MsgType.WARN(

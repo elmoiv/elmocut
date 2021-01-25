@@ -2,16 +2,10 @@ from utils import threaded
 from scapy.all import ARP, send
 from time import sleep
 
-dummy_router = {
-    'ip': '192.168.1.1',
-    'mac': 'FF:FF:FF:FF:FF:FF',
-    'vendor': 'NONE',
-    'type': 'Router',
-    'admin': True
-}
+from constants import *
 
 class Killer:
-    def __init__(self, router=dummy_router):
+    def __init__(self, router=DUMMY_ROUTER):
         self.router = router
         self.killed = {}
         self.storage = {}

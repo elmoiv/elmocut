@@ -21,25 +21,10 @@ from assets import app_icon, \
                    scan_easy_icon, scan_hard_icon, \
                    settings_icon, about_icon
 
-from utils_gui import update_settings, get_settings, check_for_update
-from utils import is_connected, goto
+from utils_gui import set_settings, get_settings
+from utils import goto, check_connection, is_connected
 
-from connector import ScanThread, UpdateThread
-
-CONNECTED = True
-
-def check_connection(func):
-    """
-    Connection checker decorator
-    """
-    def wrapper(*args, **kargs):
-        # for def func(self): in class
-        # will return kargs = {}
-        # and return args = (<__main__.ElmoCut object at 0x00000....etc>, False)
-        # so we chose the "self" reference: args[0] = <__main__.ElmoCut object at 0x00000....etc>
-        if CONNECTED:
-            return func(args[0])
-    return wrapper
+from bridge import ScanThread
 
 class ElmoCut(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -55,8 +40,11 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         # Main Props
         self.scanner = Scanner()
         self.killer = Killer()
+
+        # Settings props
         self.minimize = True
         self.remember = False
+
         self.from_tray = False
         
         # We send elmocut to the settings window
@@ -69,9 +57,6 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.scan_thread = ScanThread()
         self.scan_thread.thread_finished.connect(self.ScanThread_Reciever)
         self.scan_thread.progress.connect(self.pgbar.setValue)
-
-        self.update_thread = UpdateThread()
-        self.update_thread.thread_finished.connect(self.UpdateThread_Reciever)
         
         # Connect buttons
         self.buttons = [
@@ -86,11 +71,9 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             ]
         
         for btn, btn_func, btn_icon, btn_tip in self.buttons:
-            btn.clicked.connect(btn_func)
-            btn.setIcon(
-                self.processIcon(btn_icon)
-            )
             btn.setToolTip(btn_tip)
+            btn.clicked.connect(btn_func)
+            btn.setIcon(self.processIcon(btn_icon))
 
         self.pgbar.setVisible(False)
 
@@ -142,13 +125,23 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         pix.loadFromData(icon_data)
         icon.addPixmap(pix)
         return icon
-
-    def applySettings(self):
+    
+    def connected(self):
         """
-        Apply saved settings
+        Prompt when disconnected
         """
-        self.settings_window.updateElmocutSettings()
+        if is_connected():
+            return True
+        self.log('Connection lost!', 'red')
+        QMessageBox.critical(self, 'elmoCut', 'Connection Lost!')
+        return False
 
+    def log(self, text, color='white'):
+        """
+        Print log info at left label
+        """
+        self.lblleft.setText(f"<font color='{color}'>{text}</font>")
+    
     def openSettings(self):
         """
         Open settings window
@@ -163,12 +156,12 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         self.about_window.hide()
         self.about_window.show()
-    
-    def checkUpdate(self):
+
+    def applySettings(self):
         """
-        Update Checker
+        Apply saved settings
         """
-        self.UpdateThread_Starter()
+        self.settings_window.updateElmocutSettings()
 
     def tray_clicked(self, event):
         """
@@ -235,26 +228,6 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         )
 
         event.accept()
-    
-    def log(self, text, color='white'):
-        """
-        Print log info at left label
-        """
-        self.lblleft.setText(f"<font color='{color}'>{text}</font>")
-    
-    def connected(self):
-        """
-        Check for Internet connection
-        """
-        globals()['CONNECTED'] = True
-
-        if not is_connected():
-            self.log('No Internet Connection', 'red')
-            self.pgbar.setVisible(False)
-
-            globals()['CONNECTED'] = False
-        
-        return CONNECTED
 
     def current_index(self):
         return self.scanner.devices[self.tableScan.currentRow()]
@@ -308,13 +281,39 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
                 # Add cell to the row
                 self.tableScan.setItem(row, column, ql)
         
-        self.lblright.setText(
-                            f'{len(self.scanner.devices) - 1} devices'
-                            f' ({len(self.killer.killed)} killed)'
-        )
+        status = f'{len(self.scanner.devices) - 2} devices' \
+                 f' ({len(self.killer.killed)} killed)'
         
+        self.lblright.setText(status)
+        self.tray_icon.setToolTip(status)
+
         # Show selected cell data
         self.lblcenter.setText('Nothing Selected')
+    
+    def processDevices(self):
+        """
+        Rekill any paused device after scan
+        """
+        self.tableScan.clearSelection()
+
+        # first device in list is the router
+        self.killer.router = self.scanner.router
+
+        # re-kill paused and update to current devices
+        self.killer.rekill_stored(self.scanner.devices)
+        for rem_device in self.scanner.devices:
+            if rem_device['mac'] in get_settings('killed') * self.remember:
+                self.killer.kill(rem_device)
+
+        # clear old database
+        self.killer.release()
+
+        self.log(
+            f'Found {len(self.scanner.devices) - 1} devices.',
+            'orange'
+        )
+
+        self.showDevices()
 
     @check_connection
     def kill(self):
@@ -333,7 +332,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         
         # Killing process
         self.killer.kill(device)
-        update_settings('killed', list(self.killer.killed) * self.remember)
+        set_settings('killed', list(self.killer.killed) * self.remember)
         self.log('Killed ' + device['ip'], 'fuchsia')
         
         self.showDevices()
@@ -355,7 +354,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         
         # Unkilling process
         self.killer.unkill(device)
-        update_settings('killed', list(self.killer.killed) * self.remember)
+        set_settings('killed', list(self.killer.killed) * self.remember)
         self.log('Unkilled ' + device['ip'], 'lime')
 
         self.showDevices()
@@ -366,7 +365,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         Kill all scanned devices except admins
         """
         self.killer.kill_all(self.scanner.devices)
-        update_settings('killed', list(self.killer.killed) * self.remember)
+        set_settings('killed', list(self.killer.killed) * self.remember)
         self.log('Killed All devices.', 'fuchsia')
 
         self.showDevices()
@@ -377,36 +376,11 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         Unkill all killed devices except admins
         """
         self.killer.unkill_all()
-        update_settings('killed', list(self.killer.killed) * self.remember)
+        set_settings('killed', list(self.killer.killed) * self.remember)
         self.log('Unkilled All devices.', 'lime')
 
         self.showDevices()
 
-    def processDevices(self):
-        """
-        Rekill any paused device after scan
-        """
-        self.tableScan.clearSelection()
-        
-        # first device in list is the router
-        self.killer.router = self.scanner.router
-
-        # re-kill paused and update to current devices
-        self.killer.rekill_stored(self.scanner.devices)
-        for rem_device in self.scanner.devices:
-            if rem_device['mac'] in get_settings('killed') * self.remember:
-                self.killer.kill(rem_device)
-
-        # clear old database
-        self.killer.release()
-
-        self.log(
-            f'Found {len(self.scanner.devices) - 1} devices.',
-            'orange'
-        )
-
-        self.showDevices()
-    
     def scanEasy(self):
         """
         Easy Scan button connector
@@ -419,14 +393,14 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         # Set correct max for progress bar
         self.ScanThread_Starter(scan_type=1)
-    
+
     def ScanThread_Starter(self, scan_type=0):
         """
         self.scan_thread QThread Starter
         """
         if not self.connected():
             return
-        
+
         self.centralwidget.setEnabled(False)
         
         # Save copy of killed devices
@@ -454,29 +428,3 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.centralwidget.setEnabled(True)
         self.pgbar.setVisible(False)
         self.processDevices()
-    
-    def UpdateThread_Starter(self):
-        """
-        self.update_thread QThread starter
-        """
-        self.update_thread.update_func = check_for_update
-        self.update_thread.version = self.version
-        self.update_thread.icon = self.icon
-
-        self.update_thread.start()
-    
-    def UpdateThread_Reciever(self, result):
-        """
-        self.update_thread QThread results reciever
-        """
-        if not result:
-            return
-        
-        msg = QMessageBox.information(
-            self,
-            'New Update!',
-            f'New version {result[1]} found!\n\nClick Ok to update.',
-            QMessageBox.Ok | QMessageBox.Cancel
-        )
-        if msg == QMessageBox.Ok:
-            goto(result[0])

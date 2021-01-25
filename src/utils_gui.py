@@ -1,10 +1,10 @@
 from os import path, makedirs, environ
-from urllib.request import urlopen
-from urllib.error import URLError
 from json import dump, load
 from utils import terminal
 import ctypes
 import winreg
+
+from constants import *
 
 docs = path.join(environ['USERPROFILE'], 'Documents', 'elmocut')
 json_path = path.join(docs, 'elmocut.json')
@@ -19,7 +19,7 @@ def npcap_exists():
     """
     Check for Npcap driver
     """
-    return path.exists(r'C:\Windows\SysWOW64\Npcap')
+    return path.exists(NPCAP_PATH)
 
 def duplicate_elmocut():
     """
@@ -47,12 +47,12 @@ def export_settings(values=None):
     """
     Store current settings (or create new)
     """
-    keys = ['dark', 'count', 'autostart', 'minimized', 'remember', 'killed']
+    keys = SETTINGS_KEYS
     values = values if values else [True, 25, False, True, False, []]
     json = dict(zip(keys, values))
     dump(json, open(json_path, 'w'))
 
-def update_settings(key, value):
+def set_settings(key, value):
     """
     Update certain setting item
     """
@@ -72,7 +72,7 @@ def add_to_startup(exe_path):
     """
     key = winreg.OpenKey(
             winreg.HKEY_CURRENT_USER,
-            r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+            HKEY_AUTOSTART_PATH,
             0,
             winreg.KEY_SET_VALUE
         )
@@ -84,7 +84,7 @@ def remove_from_startup():
     """
     key = winreg.OpenKey(
             winreg.HKEY_CURRENT_USER,
-            r'SOFTWARE\Microsoft\Windows\CurrentVersion\Run',
+            HKEY_AUTOSTART_PATH,
             0,
             winreg.KEY_WRITE
         )
@@ -92,16 +92,3 @@ def remove_from_startup():
         winreg.DeleteValue(key, 'elmocut')
     except FileNotFoundError:
         pass
-
-def check_for_update(current_version, icon):
-    """
-    Checks for new version of elmocut
-    """
-    try:
-        res = urlopen('https://github.com/elmoiv/test/releases/latest').geturl()
-        new_version = res.split('/')[-1]
-        if new_version != str(current_version):
-            return [res, new_version]
-    except URLError:
-        pass
-    return []

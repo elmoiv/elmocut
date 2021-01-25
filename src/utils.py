@@ -37,15 +37,6 @@ def good_mac(mac):
     """
     return mac.upper().replace('-', ':')
 
-def is_connected():
-    """
-    Check if interface is connected to router
-    """
-    # Checks if there are any IPs in Default Gateway sections
-    # We only need to make sure we are connected to router
-    output = terminal('ipconfig | findstr "Default Gateway"')
-    return bool([i for i in output if i.isdigit()])
-
 def get_my_ip():
     """
     Try to extract ip of this device
@@ -61,3 +52,20 @@ def goto(url):
     Open url in default browser
     """
     terminal(f'start "" "{url}"')
+
+def check_connection(func):
+    """
+    Connection checker decorator
+    """
+    def wrapper(*args, **kargs):
+        if is_connected():
+            # args[0] == "self" in ElmoCut class
+            return func(args[0])
+    return wrapper
+
+def is_connected():
+    """
+    Checks if there are any IPs in Default Gateway sections
+    """
+    output = terminal('ipconfig | findstr "Default Gateway"')
+    return bool([i for i in output if i.isdigit()])
