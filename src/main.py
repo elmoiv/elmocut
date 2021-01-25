@@ -8,6 +8,8 @@ from PyQt5.QtCore import Qt
 
 from ui_main import Ui_MainWindow
 from settings import Settings
+from about import About
+
 from qtools import colored_item
 
 from scanner import Scanner
@@ -19,10 +21,10 @@ from assets import app_icon, \
                    scan_easy_icon, scan_hard_icon, \
                    settings_icon, about_icon
 
-from utils_gui import update_settings, get_settings
-from utils import is_connected
+from utils_gui import update_settings, get_settings, check_for_update
+from utils import is_connected, goto
 
-from connector import ScanThread
+from connector import ScanThread, UpdateThread
 
 CONNECTED = True
 
@@ -42,11 +44,11 @@ def check_connection(func):
 class ElmoCut(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.version = 0.2
-        icon = self.processIcon(app_icon)
+        self.version = 1.0
+        self.icon = self.processIcon(app_icon)
 
         # Add window icon
-        self.setWindowIcon(icon)
+        self.setWindowIcon(self.icon)
         self.setupUi(self)
         self.setStyleSheet(load_stylesheet())
         
@@ -58,7 +60,8 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.from_tray = False
         
         # We send elmocut to the settings window
-        self.settings_window = Settings(self, icon)
+        self.settings_window = Settings(self, self.icon)
+        self.about_window = About(self, self.icon)
 
         self.applySettings()
 
@@ -66,6 +69,9 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.scan_thread = ScanThread()
         self.scan_thread.thread_finished.connect(self.ScanThread_Reciever)
         self.scan_thread.progress.connect(self.pgbar.setValue)
+
+        self.update_thread = UpdateThread()
+        self.update_thread.thread_finished.connect(self.UpdateThread_Reciever)
         
         # Connect buttons
         self.buttons = [
@@ -120,7 +126,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         tray_menu.addAction(quit_option)
         
         self.tray_icon = QSystemTrayIcon(self)
-        self.tray_icon.setIcon(icon)
+        self.tray_icon.setIcon(self.icon)
         self.tray_icon.setToolTip('elmoCut')
         self.tray_icon.setContextMenu(tray_menu)
         self.tray_icon.show()
@@ -147,14 +153,22 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         Open settings window
         """
+        self.settings_window.hide()
         self.settings_window.currentSettings()
         self.settings_window.show()
-    
+
     def openAbout(self):
         """
         Open about window
         """
-        QMessageBox.information(self, 'About', 'Built with love by:\n\nKhaled El-Morshedy')
+        self.about_window.hide()
+        self.about_window.show()
+    
+    def checkUpdate(self):
+        """
+        Update Checker
+        """
+        self.UpdateThread_Starter()
 
     def tray_clicked(self, event):
         """
@@ -169,6 +183,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         self.hide()
         self.settings_window.hide()
+        self.about_window.hide()
 
     def quit_all(self):
         """
@@ -176,6 +191,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         self.killer.unkill_all()
         self.settings_window.close()
+        self.about_window.close()
         self.from_tray = True
         self.close()
 
@@ -206,15 +222,19 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         ## If not kill all and shutdown
         self.killer.unkill_all()
         self.settings_window.close()
-        event.accept()
+        self.about_window.close()
+
+        self.hide()
 
         QMessageBox.information(
             self,
             'Shutdown',
             'elmoCut will exit completely.\n\n'
-            'Enable minimized from settings\nto'
-            ' be able to run in background.'
+            'Enable minimized from settings\n'
+            'to be able to run in background.'
         )
+
+        event.accept()
     
     def log(self, text, color='white'):
         """
@@ -434,3 +454,29 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.centralwidget.setEnabled(True)
         self.pgbar.setVisible(False)
         self.processDevices()
+    
+    def UpdateThread_Starter(self):
+        """
+        self.update_thread QThread starter
+        """
+        self.update_thread.update_func = check_for_update
+        self.update_thread.version = self.version
+        self.update_thread.icon = self.icon
+
+        self.update_thread.start()
+    
+    def UpdateThread_Reciever(self, result):
+        """
+        self.update_thread QThread results reciever
+        """
+        if not result:
+            return
+        
+        msg = QMessageBox.information(
+            self,
+            'New Update!',
+            f'New version {result[1]} found!\n\nClick Ok to update.',
+            QMessageBox.Ok | QMessageBox.Cancel
+        )
+        if msg == QMessageBox.Ok:
+            goto(result[0])

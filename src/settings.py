@@ -67,6 +67,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.elmocut.remember = s['remember']
         self.elmocut.scanner.device_count = s['count']
         self.elmocut.setStyleSheet(self.styleSheet())
+        self.elmocut.about_window.setStyleSheet(self.styleSheet())
 
     def currentSettings(self):
         s = import_settings()

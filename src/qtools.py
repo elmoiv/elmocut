@@ -24,7 +24,7 @@ def colored_item(elmnt, c1, c2):
     elmnt.setBackground(QColor(c1))
     elmnt.setForeground(QColor(c2))
 
-def msg_box(title, text, windows_icon, icon, buttons=Buttons.OK):
+def msg_box(title, text, window_icon, icon, buttons=Buttons.OK):
     """
     Main app independent QMessageBox
     """
@@ -32,5 +32,6 @@ def msg_box(title, text, windows_icon, icon, buttons=Buttons.OK):
     msg.setWindowTitle(title)
     msg.setText(text)
     msg.setWindowIcon(icon)
+    msg.setIcon(window_icon)
     msg.setStandardButtons(buttons)
     return msg.exec_()

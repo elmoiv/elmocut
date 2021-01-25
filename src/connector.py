@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QThread, pyqtSignal
+from utils_gui import check_for_update
 
 class ScanThread(QThread):
     # Progress Bar value signal
@@ -31,3 +32,18 @@ class ScanThread(QThread):
         self.scanner.qt_progress_signal = self.progress.emit
         self.scanner.ping_scan()
         self.scanner.arping_cache()
+
+class UpdateThread(QThread):
+    thread_finished = pyqtSignal(list)
+
+    def __init__(self):
+        QThread.__init__(self)
+        self.update_func = None
+        self.icon = None
+        self.version = None
+
+    def run(self):
+        result = self.update_func(self.version, self.icon)
+
+        # Emit update results to elmocut reciever
+        self.thread_finished.emit(result)

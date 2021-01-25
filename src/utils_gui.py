@@ -1,5 +1,6 @@
-from win32gui import EnumWindows, GetWindowText, ShowWindow
 from os import path, makedirs, environ
+from urllib.request import urlopen
+from urllib.error import URLError
 from json import dump, load
 from utils import terminal
 import ctypes
@@ -26,26 +27,6 @@ def duplicate_elmocut():
     """
     tasklist = terminal('tasklist')
     return tasklist.lower().count('elmocut.exe') > 1
-
-def bring_elmocut_tofront():
-    # Inspired from:
-    # https://github.com/iwalton3/plex-mpv-shim/blob/master/plex_mpv_shim/win_utils.py
-    """
-    Bring elmoCut window to front
-    """
-    top_windows = {}
-    
-    # Get all windows with and store hwnd in dict
-    def window_enumeration_handler(hwnd, top_windows):
-        top_windows[GetWindowText(hwnd).lower()] = hwnd
-    EnumWindows(window_enumeration_handler, top_windows)
-    
-    # Detect elmocut
-    elmocut_gui = top_windows['elmocut']
-    
-    # Bring window to front
-    ShowWindow(elmocut_gui, 6) # Minimize
-    ShowWindow(elmocut_gui, 9) # Un-minimize
 
 def check_documents_dir():
     """
@@ -111,3 +92,16 @@ def remove_from_startup():
         winreg.DeleteValue(key, 'elmocut')
     except FileNotFoundError:
         pass
+
+def check_for_update(current_version, icon):
+    """
+    Checks for new version of elmocut
+    """
+    try:
+        res = urlopen('https://github.com/elmoiv/test/releases/latest').geturl()
+        new_version = res.split('/')[-1]
+        if new_version != str(current_version):
+            return [res, new_version]
+    except URLError:
+        pass
+    return []

@@ -57,4 +57,7 @@ def get_my_ip():
         return '127.0.0.1'
 
 def goto(url):
-    terminal(f'start "" "{url}"', True)
+    """
+    Open url in default browser
+    """
+    terminal(f'start "" "{url}"')
