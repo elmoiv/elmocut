@@ -51,6 +51,68 @@
       <property name="spacing">
        <number>6</number>
       </property>
+      <item row="4" column="0" colspan="4">
+       <widget class="QLabel" name="lblNickName">
+        <property name="text">
+         <string>My Nick Name</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="4">
+       <widget class="QLabel" name="label">
+        <property name="font">
+         <font>
+          <pointsize>5</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="4">
+       <widget class="QLabel" name="lblMyName">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>13</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>My Name</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2">
+       <widget class="QLabel" name="lblLinkedIn">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>LinkedIn</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
       <item row="5" column="0">
        <widget class="QLabel" name="lblFacebook">
         <property name="cursor">
@@ -89,69 +151,6 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="2">
-       <widget class="QLabel" name="lblLinkedIn">
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="text">
-         <string>LinkedIn</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="3">
-       <widget class="QLabel" name="lblGitHub">
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="text">
-         <string>GitHub</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="4">
-       <widget class="QLabel" name="label">
-        <property name="font">
-         <font>
-          <pointsize>5</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" colspan="4">
-       <widget class="QLabel" name="lblAppIcon">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>154</height>
-         </size>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="text">
-         <string>App Icon</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0" colspan="4">
        <widget class="QLabel" name="lblAppName">
         <property name="sizePolicy">
@@ -179,8 +178,21 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="4">
-       <widget class="QLabel" name="lblMyName">
+      <item row="5" column="3">
+       <widget class="QLabel" name="lblGitHub">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>GitHub</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QLabel" name="lblAppIcon">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -190,26 +202,14 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>40</height>
+          <height>154</height>
          </size>
         </property>
-        <property name="font">
-         <font>
-          <pointsize>13</pointsize>
-         </font>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="text">
-         <string>My Name</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="4">
-       <widget class="QLabel" name="lblNickName">
-        <property name="text">
-         <string>My Nick Name</string>
+         <string>App Icon</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
