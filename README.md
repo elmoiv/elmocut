@@ -9,7 +9,7 @@
 
 <p align=center>
   <img src="https://img.shields.io/github/downloads/elmoiv/elmocut/total.svg" alt="elmoCut icon">
-  <a target="_blank" href="LICENSE" title="License: MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
+  <a target="_blank" href="LICENSE" title="License: MIT"><img src="https://img.shields.io/github/license/elmoiv/elmocut"></a>
 </p>
 <p align=center>
   <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview.png" alt="elmoCut icon">
