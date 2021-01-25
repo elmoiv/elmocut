@@ -1,5 +1,5 @@
-from utils import threaded
 from scapy.all import ARP, send
+from utils import threaded
 from time import sleep
 
 from constants import *
