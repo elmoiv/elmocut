@@ -5,7 +5,7 @@
   elmoCut
   <br>
 </h1>
-<h4 align="center">Eye candy ARP spoofer for windows</h4>
+<h4 align="center">Eye candy ARP spoofer for Windows</h4>
 
 <p align=center>
   <img src="https://img.shields.io/github/downloads/elmoiv/elmocut/total.svg" alt="elmoCut icon">
