@@ -22,13 +22,41 @@
   </a>
 </p>
 
-## Screenshot
-<p align=center>
-  <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview.png" alt="elmoCut icon">
-</p>
+## Screenshots
+
+<table>
+  <tr>
+    <th colspan="3">
+      <samp><h3>Main UI</h3></samp><br>
+      <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview.png?raw=true" alt="Settings window">
+    </th>
+  </tr>
+  <tr>
+    <th>
+      <samp><h3>Settings window</h3></samp>
+    </th>
+    <th>
+      <samp><h3>Tray Icon</h3></samp>
+    </th>
+    <th>
+      <samp><h3>Tray menu</h3></samp>
+    </th>
+  </tr>
+  <tr>
+    <th>
+      <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview-settings.png?raw=true" alt="Settings window">
+    </th>
+    <th>
+      <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview-tray.png?raw=true" alt="Tray icon">
+    </th>
+    <th>
+      <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview-tray-menu.png?raw=true" alt="Tray icon menu">
+    </th>
+  </tr>
+</table>
 
 ## Description
-elmoCut aims to make arp spoofing easy for everyone with all the hard work done under the hood. One of it's main feauters is to use as low CPU and RAM usage as possible while offering nearly the same results as other closed source spoofers.
+elmoCut aims to make arp spoofing easy for all users with all the hard work done under the hood. One of it's main feauters is to use as low CPU and RAM usage as possible while offering nearly the same results as other closed source spoofers.
 
 ## Features
 - Clean UI
@@ -39,7 +67,7 @@ elmoCut aims to make arp spoofing easy for everyone with all the hard work done 
 - Run minimized in the background.
 
 ## Limitations
-- Can only search for 255 devices (*255.255.255.0 subnet masks*)
+- Can only search for 255 devices (255.255.255.0 subnet masks)
 - Works only on default interface.
 - Both scan types are manaul.
 
@@ -48,18 +76,28 @@ elmoCut aims to make arp spoofing easy for everyone with all the hard work done 
   <img src="https://github.com/elmoiv/elmocut/blob/main/data/download.png" alt="download elmoCut" width=50>
 </a>
 
-## Building from source
-Requirements:
-- Required:
-  - Pyinstaller
-  - PyQt5 Tools
-- `pip install pyqt5-tools`
+## Running from source
+ - Install requirements via pip: `pip install -r requirements.txt`
+ - Ensure that `pyuic5` is in PATH
+ - Click on `RUN.bat`
+
+## Compiling to EXE
+ - Required:
+    - PyInstaller: `pip install pyinstaller`
+ - Optionals:
+    - UPX: [Download](https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win64.zip)
+    - Inno Setup: [Download](https://files.jrsoftware.org/is/6/innosetup-6.0.3.exe)
+
+***Make sure that all of the above are in PATH in order to build elmoCut without issues***
+
+Now run: `python build.py`
+
 ## Manual
 <table>
   <tr>
-    <td><samp>Button</samp></td>
-    <td><samp>Description</samp></td>
-    <td><samp>Notes</samp></td>
+    <th><samp>Button</samp></th>
+    <th><samp>Description</samp></th>
+    <th><samp>Notes</samp></th>
   </tr>
   <tr>
     <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/scan_easy.png?raw=true" alt="ARP Scan" width="80px"></td>
@@ -110,7 +148,6 @@ Requirements:
 - [ ] Background live connection checker.
 - [ ] Background live devices discovery.
 - [ ] Extend scan for all subnet masks.
-- [ ] Re-form code as a library.
 
 ## Contribution
 Please contribute! If you want to fix a bug, suggest improvements, or add new features to the project, just [open an issue](https://github.com/elmoiv/elmocut/issues) or send me a pull request.
