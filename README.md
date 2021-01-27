@@ -29,6 +29,7 @@
   <a href="#features">Features</a> &bull;
   <a href="#limitations">Limitations</a> &bull;
   <a href="#download">Download</a> &bull;
+  <a href="#requirements">Requirements</a> &bull;
   <a href="#run">Run</a> &bull;
   <a href="#build">Build</a> &bull;
   <a href="#manual">Manual</a> &bull;
@@ -98,15 +99,19 @@ One of it's main feauters is to use as low CPU and RAM usage as possible while o
   <img src="https://github.com/elmoiv/elmocut/blob/main/data/download.png" alt="download elmoCut" width=50>
 </a>
 
+## Requirements
+  - Npcap: [Download](https://nmap.org/npcap/dist/npcap-1.10.exe)
+  - x64 Microsoft Windows >= 7
+ 
 ## Run
  - Install requirements via pip: `pip install -r requirements.txt`
  - Ensure that `pyuic5` is in PATH
  - Click on `RUN.bat`
 
 ## Build
- - Required:
+ - **Required**:
     - PyInstaller: `pip install pyinstaller`
- - Optionals:
+ - **Optionals**:
     - UPX: [Download](https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win64.zip)
     - Inno Setup: [Download](https://files.jrsoftware.org/is/6/innosetup-6.0.3.exe)
 
