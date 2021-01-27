@@ -31,8 +31,17 @@
 elmoCut aims to make arp spoofing easy for all users with all the hard work done under the hood. One of it's main feauters is to use as low CPU and RAM usage as possible while offering nearly the same results as other closed source spoofers.
 
 ## Features
+- Clean UI
+- One click to block all devices.
+- Re-kill devices that changed their ip during block.
+- Remember killed devices before exit.
+- Start with windows.
+- Run minimized in the background.
 
 ## Limitations
+- Can only search for 255 devices (255.255.255.0 subnet masks)
+- Works only on default interface.
+- Both scan types are manaul.
 
 ## Download
 
@@ -88,6 +97,8 @@ elmoCut aims to make arp spoofing easy for all users with all the hard work done
 </table>
 
 ## TODO
+- [ ] Protect elmoCut user from other spoofers.
+- [ ] Select between available interfaces.
 - [ ] Control connected devices limit.
 - [ ] Background live connection checker.
 - [ ] Background live devices discovery.
