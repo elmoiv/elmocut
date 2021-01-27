@@ -111,5 +111,5 @@ elmoCut aims to make arp spoofing easy for all users with all the hard work done
 Please contribute! If you want to fix a bug, suggest improvements, or add new features to the project, just [open an issue](https://github.com/elmoiv/elmocut/issues) or send me a pull request.
 
 ## License
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/MIT_logo.svg/321px-MIT_logo.svg.png" width=100>
+<img src="https://github.com/elmoiv/elmocut/blob/main/data/mit.png" width=100>
 elmoCut is Free Software: You can use, study share and improve it at your will. Specifically you can redistribute and/or modify it under the terms of the MIT License as published by the Massachusetts Institute of Technology.
