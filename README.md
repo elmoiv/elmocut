@@ -43,7 +43,7 @@
 <table>
   <tr>
     <th colspan="3">
-      <samp><h3>Main UI</h3></samp><br>
+      <samp><h3>Main window</h3></samp><br>
       <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview.png?raw=true" alt="Settings window">
     </th>
   </tr>
@@ -72,7 +72,9 @@
 </table>
 
 ## Description
-elmoCut aims to make arp spoofing easy for all users with all the hard work done under the hood. One of it's main feauters is to use as low CPU and RAM usage as possible while offering nearly the same results as other closed source spoofers.
+elmoCut aims to make arp spoofing easy for all users with all the hard work done under the hood.
+
+One of it's main feauters is to use as low CPU and RAM usage as possible while offering nearly the same results as other closed source spoofers.
 
 ## Features
 - Clean UI
