@@ -15,7 +15,7 @@
     <img src="https://img.shields.io/github/downloads/elmoiv/elmocut/total.svg">
   </a>
   <a target="_blank" href="LICENSE" title="License: MIT">
-    <img src="https://img.shields.io/github/license/elmoiv/elmocut">
+    <img src="https://img.shields.io/github/license/elmoiv/elmocut?maxAge=2592000">
   </a>
 </p>
 
