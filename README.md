@@ -22,6 +22,22 @@
   </a>
 </p>
 
+<hr>
+<p align="center">
+  <a href="#screenshots">Screenshots</a> &bull;
+  <a href="#description">Description</a> &bull;
+  <a href="#features">Features</a> &bull;
+  <a href="#limitations">Limitations</a> &bull;
+  <a href="#download">Download</a> &bull;
+  <a href="#run">Run</a> &bull;
+  <a href="#build">Build</a> &bull;
+  <a href="#manual">Manual</a> &bull;
+  <a href="#todo">TODO</a> &bull;
+  <a href="#contribution">Contribution</a> &bull;
+  <a href="#license">License</a>
+</p>
+<hr>
+
 ## Screenshots
 
 <table>
@@ -76,12 +92,12 @@ elmoCut aims to make arp spoofing easy for all users with all the hard work done
   <img src="https://github.com/elmoiv/elmocut/blob/main/data/download.png" alt="download elmoCut" width=50>
 </a>
 
-## Running from source
+## Run
  - Install requirements via pip: `pip install -r requirements.txt`
  - Ensure that `pyuic5` is in PATH
  - Click on `RUN.bat`
 
-## Compiling to EXE
+## Build
  - Required:
     - PyInstaller: `pip install pyinstaller`
  - Optionals:
