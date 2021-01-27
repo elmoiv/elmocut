@@ -28,7 +28,7 @@
 </p>
 
 ## Description
-elmoCut aims to make arp spoofing easy for all users with all the hard work done under the hood. One of it's main feauters is to use as low CPU and RAM usage as possible while offering nearly the same results as other closed source spoofers.
+elmoCut aims to make arp spoofing easy for everyone with all the hard work done under the hood. One of it's main feauters is to use as low CPU and RAM usage as possible while offering nearly the same results as other closed source spoofers.
 
 ## Features
 - Clean UI
@@ -39,7 +39,7 @@ elmoCut aims to make arp spoofing easy for all users with all the hard work done
 - Run minimized in the background.
 
 ## Limitations
-- Can only search for 255 devices (255.255.255.0 subnet masks)
+- Can only search for 255 devices (*255.255.255.0 subnet masks*)
 - Works only on default interface.
 - Both scan types are manaul.
 
@@ -49,7 +49,11 @@ elmoCut aims to make arp spoofing easy for all users with all the hard work done
 </a>
 
 ## Building from source
-
+Requirements:
+- Required:
+  - Pyinstaller
+  - PyQt5 Tools
+- `pip install pyqt5-tools`
 ## Manual
 <table>
   <tr>
@@ -106,6 +110,7 @@ elmoCut aims to make arp spoofing easy for all users with all the hard work done
 - [ ] Background live connection checker.
 - [ ] Background live devices discovery.
 - [ ] Extend scan for all subnet masks.
+- [ ] Re-form code as a library.
 
 ## Contribution
 Please contribute! If you want to fix a bug, suggest improvements, or add new features to the project, just [open an issue](https://github.com/elmoiv/elmocut/issues) or send me a pull request.
