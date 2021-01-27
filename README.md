@@ -82,7 +82,7 @@ elmoCut aims to make arp spoofing easy for all users with all the hard work done
 One of it's main feauters is to use as low CPU and RAM usage as possible while offering nearly the same results as other closed source spoofers.
 
 ## Features
-- Clean UI
+- Clean UI.
 - One click to block all devices.
 - Re-kill devices that changed their ip during block.
 - Remember killed devices before exit.
