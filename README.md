@@ -43,7 +43,11 @@
 <table>
   <tr>
     <th colspan="3">
-      <samp><h3>Main window</h3></samp><br>
+      <samp><h3>Main window</h3></samp>
+    </th>
+  </tr>
+  <tr>
+    <th colspan="3">
       <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview.png?raw=true" alt="Settings window">
     </th>
   </tr>
