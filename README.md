@@ -44,6 +44,9 @@ elmoCut aims to make arp spoofing easy for all users with all the hard work done
 - Both scan types are manaul.
 
 ## Download
+<a href="https://github.com/elmoiv/elmocut/releases/latest">
+  <img src="https://github.com/elmoiv/elmocut/blob/main/data/download.png" alt="download elmoCut" width=50>
+</a>
 
 ## Building from source
 
