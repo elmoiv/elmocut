@@ -44,13 +44,13 @@
   </tr>
   <tr>
     <th>
-      <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview-settings.png?raw=true" alt="Settings window">
+      <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview-settings.png" alt="Settings window">
     </th>
     <th>
-      <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview-tray.png?raw=true" alt="Tray icon">
+      <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview-tray.png" alt="Tray icon">
     </th>
     <th>
-      <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview-tray-menu.png?raw=true" alt="Tray icon menu">
+      <img src="https://github.com/elmoiv/elmocut/blob/main/data/preview-tray-menu.png" alt="Tray icon menu">
     </th>
   </tr>
 </table>
@@ -100,42 +100,42 @@ Now run: `python build.py`
     <th><samp>Notes</samp></th>
   </tr>
   <tr>
-    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/scan_easy.png?raw=true" alt="ARP Scan" width="80px"></td>
+    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/scan_easy.png" alt="ARP Scan" width="80px"></td>
     <td><samp>Perform ARP Scan</samp></td>
     <td><samp>Fast but not all devices are detected</samp></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/scan_hard.png?raw=true" alt="Ping Scan" width="80px"></td>
+    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/scan_hard.png" alt="Ping Scan" width="80px"></td>
     <td><samp>Perform Ping Scan</samp></td>
     <td><samp>Slower than ARP but all devices are detected</samp></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/kill.png?raw=true" alt="ARP Scan" width="80px"></td>
+    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/kill.png" alt="ARP Scan" width="80px"></td>
     <td><samp>Block the selected device from accessing internet</samp></td>
     <td><samp>-</samp></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/unkill.png?raw=true" alt="ARP Scan" width="80px"></td>
+    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/unkill.png" alt="ARP Scan" width="80px"></td>
     <td><samp>Allow the Blocked device to access internet</samp></td>
     <td><samp>-</samp></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/killall.png?raw=true" alt="ARP Scan" width="80px"></td>
+    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/killall.png" alt="ARP Scan" width="80px"></td>
     <td><samp>Block all connected devices</samp></td>
     <td><samp>-</samp></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/unkillall.png?raw=true" alt="ARP Scan" width="80px"></td>
+    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/unkillall.png" alt="ARP Scan" width="80px"></td>
     <td><samp>Allow all blocked devices</samp></td>
     <td><samp>-</samp></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/settings.png?raw=true" alt="ARP Scan" width="80px"></td>
+    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/settings.png" alt="ARP Scan" width="80px"></td>
     <td><samp>View elmoCut settings window</samp></td>
     <td><samp>-</samp></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/about.png?raw=true" alt="ARP Scan" width="80px"></td>
+    <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/about.png" alt="ARP Scan" width="80px"></td>
     <td><samp>view elmoCut about window</samp></td>
     <td><samp>-</samp></td>
   </tr>
