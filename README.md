@@ -30,9 +30,9 @@
   <a href="#limitations">Limitations</a> &bull;
   <a href="#download">Download</a> &bull;
   <a href="#requirements">Requirements</a> &bull;
+  <a href="#manual">Manual</a> &bull;
   <a href="#run">Run</a> &bull;
   <a href="#build">Build</a> &bull;
-  <a href="#manual">Manual</a> &bull;
   <a href="#todo">TODO</a> &bull;
   <a href="#contribution">Contribution</a> &bull;
   <a href="#license">License</a>
@@ -102,22 +102,6 @@ One of it's main feauters is to use as low CPU and RAM usage as possible while o
 ## Requirements
   - Npcap: [Download](https://nmap.org/npcap/dist/npcap-1.10.exe)
   - x64 Microsoft Windows >= 7
- 
-## Run
- - Install requirements via pip: `pip install -r requirements.txt`
- - Ensure that `pyuic5` is in PATH
- - Click on `RUN.bat`
-
-## Build
- - **Required**:
-    - PyInstaller: `pip install pyinstaller`
- - **Optionals**:
-    - UPX: [Download](https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win64.zip)
-    - Inno Setup: [Download](https://files.jrsoftware.org/is/6/innosetup-6.0.3.exe)
-
-***Make sure that all of the above are in PATH in order to build elmoCut without issues***
-
-Now run: `python build.py`
 
 ## Manual
 <table>
@@ -167,6 +151,24 @@ Now run: `python build.py`
     <td><samp>-</samp></td>
   </tr>
 </table>
+ 
+## Run
+ - Install requirements via pip: `pip install -r requirements.txt`
+ - Ensure that `pyuic5` is in PATH
+ - Click on `RUN.bat`
+
+## Build
+ - **Required**:
+    - PyInstaller: `pip install pyinstaller`
+ - **Optionals**:
+    - UPX: [Download](https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win64.zip)
+    - Inno Setup: [Download](https://files.jrsoftware.org/is/6/innosetup-6.0.3.exe)
+
+***Make sure that all of the above are in PATH in order to build elmoCut without issues***
+
+Now run: `python build.py`
+
+
 
 ## TODO
 - [ ] Protect elmoCut user from other spoofers.
