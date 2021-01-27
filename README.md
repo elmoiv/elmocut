@@ -163,7 +163,7 @@ One of it's main feauters is to use as low CPU and RAM usage as possible while o
 
 ***Make sure that all of the above are in PATH in order to build elmoCut without issues***
 
-Now run: `python build.py`
+Now run: `BUILD.bat`
 
 
 
