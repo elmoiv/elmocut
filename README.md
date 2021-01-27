@@ -8,9 +8,6 @@
 <h4 align="center">Eye candy ARP spoofer for Windows</h4>
 
 <p align=center>
-  <a target="_blank" href="http://hits.dwyl.io/elmoiv/elmocut" title="Latest release">
-    <img src="http://hits.dwyl.io/elmoiv/elmocut.svg">
-  </a>
   <a target="_blank" href="https://github.com/elmoiv/elmocut/releases/latest" title="Latest release">
     <img src="https://img.shields.io/github/v/release/elmoiv/elmocut">
   </a>
