@@ -92,9 +92,14 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 - Both scan types are manaul.
 
 ## Download
-<a href="https://github.com/elmoiv/elmocut/releases/latest">
-  <img src="https://github.com/elmoiv/elmocut/blob/main/data/download.png" alt="download elmoCut" width=50>
-</a>
+- GitHub:
+
+<a href="https://github.com/elmoiv/elmocut/releases/latest"><img src="https://github.com/elmoiv/elmocut/blob/main/data/download.png" alt="download elmoCut" width=50></a>
+
+- SourceForge:
+
+[![Download elmocut](https://a.fsdn.com/con/app/sf-download-button)](https://sourceforge.net/projects/elmocut/files/latest/download)
+
 
 ## Requirements
   - Npcap: [Download](https://nmap.org/npcap/dist/npcap-1.10.exe)
