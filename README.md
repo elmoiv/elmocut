@@ -76,7 +76,7 @@
 ## Description
 elmoCut aims to make arp spoofing easy for all users with all the hard work done under the hood.
 
-One of it's main feauters is to use as low CPU and RAM usage as possible while offering nearly the same results as other closed source spoofers.
+One of it's main features is to use as low CPU and RAM usage as possible while offering nearly the same results as other closed source spoofers.
 
 ## Features
 - Clean UI.
