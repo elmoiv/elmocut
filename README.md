@@ -9,10 +9,13 @@
 
 <p align=center>
   <a target="_blank" href="https://github.com/elmoiv/elmocut/releases/latest" title="Latest release">
-    <img src="https://img.shields.io/github/v/release/elmoiv/elmocut?maxAge=24010">
+    <img src="https://img.shields.io/github/v/release/elmoiv/elmocut">
   </a>
-  <a target="_blank" href="https://github.com/elmoiv/elmocut/releases/latest" title="Downloads">
-    <img src="https://img.shields.io/github/downloads/elmoiv/elmocut/total.svg?maxAge=24110">
+  <a target="_blank" href="https://sourceforge.net/projects/elmocut/files/latest/download" title="SourceForge Downloads">
+    <img src="https://img.shields.io/sourceforge/dm/elmocut?label=SourceForge">
+  </a>
+  <a target="_blank" href="https://github.com/elmoiv/elmocut/releases/latest" title="GitHub Downloads">
+    <img src="https://img.shields.io/github/downloads/elmoiv/elmocut/total.svg?label=GitHub">
   </a>
   <a target="_blank" href="LICENSE" title="License: MIT">
     <img src="https://img.shields.io/github/license/elmoiv/elmocut">
