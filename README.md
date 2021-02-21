@@ -12,7 +12,7 @@
     <img src="https://img.shields.io/github/v/release/elmoiv/elmocut">
   </a>
   <a target="_blank" href="https://sourceforge.net/projects/elmocut/files/latest/download" title="SourceForge Downloads">
-    <img src="https://img.shields.io/sourceforge/dm/elmocut?label=SourceForge">
+    <img src="https://img.shields.io/sourceforge/dt/elmocut?label=SourceForge">
   </a>
   <a target="_blank" href="https://github.com/elmoiv/elmocut/releases/latest" title="GitHub Downloads">
     <img src="https://img.shields.io/github/downloads/elmoiv/elmocut/total.svg?label=GitHub">
