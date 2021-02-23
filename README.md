@@ -187,6 +187,9 @@ Now run: `BUILD.bat`
 ## Contribution
 Please contribute! If you want to fix a bug, suggest improvements, or add new features to the project, just [open an issue](https://github.com/elmoiv/elmocut/issues) or send me a pull request.
 
+## Stargazers over time
+[![Stargazers over time](https://starchart.cc/elmoiv/elmocut.svg)](https://starchart.cc/elmoiv/elmocut)
+
 ## License
 <img src="https://github.com/elmoiv/elmocut/blob/main/data/mit.png" width=100>
 elmoCut is Free Software: You can use, study share and improve it at your will. Specifically you can redistribute and/or modify it under the terms of the MIT License as published by the Massachusetts Institute of Technology.
