@@ -177,9 +177,9 @@ Now run: `BUILD.bat`
 
 
 ## TODO
+- [ ] Control download and upload limit of connected devices.
 - [ ] Protect elmoCut user from other spoofers.
 - [ ] Select between available interfaces.
-- [ ] Control connected devices limit.
 - [ ] Background live connection checker.
 - [ ] Background live devices discovery.
 - [ ] Extend scan for all subnet masks.
