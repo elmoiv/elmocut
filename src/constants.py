@@ -4,7 +4,7 @@ NPCAP_PATH = 'C:\\Windows\\SysWOW64\\Npcap'
 
 GLOBAL_MAC = 'FF:FF:FF:FF:FF:FF'
 
-DUMMY_ROUTER = dummy_router = {
+DUMMY_ROUTER = {
     'ip': '192.168.1.1',
     'mac': 'FF:FF:FF:FF:FF:FF',
     'vendor': 'NONE',
