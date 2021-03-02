@@ -29,7 +29,7 @@ from bridge import ScanThread
 class ElmoCut(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.version = 1.0
+        self.version = 1.1
         self.icon = self.processIcon(app_icon)
 
         # Add window icon
