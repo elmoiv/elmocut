@@ -48,7 +48,7 @@ def export_settings(values=None):
     Store current settings (or create new)
     """
     keys = SETTINGS_KEYS
-    values = values if values else [True, 25, False, True, False, []]
+    values = values if values else SETTINGS_VALS
     json = dict(zip(keys, values))
     dump(json, open(json_path, 'w'))
 
@@ -76,7 +76,12 @@ def add_to_startup(exe_path):
             0,
             winreg.KEY_SET_VALUE
         )
-    winreg.SetValueEx(key, 'elmocut', 0, winreg.REG_SZ, exe_path)
+    winreg.SetValueEx(
+        key,
+        'elmocut',
+        0,
+        winreg.REG_SZ, exe_path
+    )
 
 def remove_from_startup():
     """
