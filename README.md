@@ -27,6 +27,7 @@
 <p align="center">
   <a href="#screenshots">Screenshots</a> &bull;
   <a href="#description">Description</a> &bull;
+  <a href="#disclaimer">Disclaimer</a> &bull;
   <a href="#features">Features</a> &bull;
   <a href="#limitations">Limitations</a> &bull;
   <a href="#download">Download</a> &bull;
@@ -81,6 +82,10 @@
 elmoCut aims to make arp spoofing easy for all users with all the hard work done under the hood.
 
 One of it's main features is to use as low CPU and RAM usage as possible while offering nearly the same results as other closed source spoofers.
+
+## Disclaimer
+**The use of this software is done at your own discretion and risk and with agreement that you will be solely responsible for any damage to your/others computer system or loss of data that may/will result from such activities**
+
 
 ## Features
 - Clean UI.
@@ -173,7 +178,6 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 ***Make sure that all of the above are in PATH in order to build elmoCut without issues***
 
 Now run: `BUILD.bat`
-
 
 
 ## TODO
