@@ -14,6 +14,8 @@ def terminal(command, shell=True, decode=True):
         return cmd.decode() if decode else None
     except CalledProcessError:
         return None
+    except UnicodeDecodeError:
+        return str(cmd)
 
 def threaded(fn):
     """
