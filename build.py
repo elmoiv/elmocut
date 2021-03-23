@@ -82,7 +82,8 @@ iss_file = '''#define MyAppName "elmoCut"
 [Setup]
 AppId={{{{31430AA0-C0A7-4598-991B-E3B2CD961817}}
 AppName={{#MyAppName}}
-AppVersion={{#MyAppVersion}}
+AppVersion={1}
+VersionInfoVersion={2}
 AppPublisher={{#MyAppPublisher}}
 AppPublisherURL={{#MyAppURL}}
 AppSupportURL={{#MyAppURL}}
@@ -92,7 +93,7 @@ DisableDirPage=yes
 DisableProgramGroupPage=yes
 UsedUserAreasWarning=no
 PrivilegesRequiredOverridesAllowed=dialog
-OutputBaseFilename=elmoCut Installer
+OutputBaseFilename=elmoCut setup x64
 UninstallDisplayIcon={{app}}\\elmocut.exe
 WizardSmallImageFile={0}exe\\setup_img.bmp
 SolidCompression=yes
@@ -127,7 +128,6 @@ Source: "{0}output\\elmocut\\Qt5Widgets.dll"; DestDir: "{{app}}"; Flags: ignorev
 Source: "{0}output\\elmocut\\select.pyd"; DestDir: "{{app}}"; Flags: ignoreversion
 Source: "{0}output\\elmocut\\VCRUNTIME140.dll"; DestDir: "{{app}}"; Flags: ignoreversion
 Source: "{0}output\\elmocut\\win32api.pyd"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\win32gui.pyd"; DestDir: "{{app}}"; Flags: ignoreversion
 Source: "{0}output\\elmocut\\PyQt5\\*"; DestDir: "{{app}}\\PyQt5"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{0}output\\elmocut\\manuf\\*"; DestDir: "{{app}}\\manuf"; Flags: ignoreversion
 Source: "{0}output\\elmocut\\include\\*"; DestDir: "{{app}}\\include"; Flags: ignoreversion
@@ -147,11 +147,11 @@ excluded_upx = ['qwindows.dll', 'qsvgicon.dll', 'qxdgdesktopportal.dll', 'qwindo
 excluded_modules = ['tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'PIL', 'tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'matplotlib', 'IPython', 'scipy', 'eel', 'cryptography', 'jedi', 'win32com', 'numpy', 'wcwidth', 'win32wnet', 'unicodedata', '_asyncio', '_bz2', '_decimal', '_hashlib', '_lzma', '_multiprocessing', '_overlapped', '_win32sysloader', '_ssl']
 
 is_gui = not bool(input('Press Enter for GUI, or anything for Console: '))
-version = '0.2'
+version = '1.1'
 
 import os, shutil, time
 
-def verison_fromat(s):
+def version_format(s):
     # Convert xx.xx.xx.xx -> (xx, xx, xx, xx)
     e = [0, 0, 0, 0]
     for n, i in enumerate(s.split('.')):
@@ -167,7 +167,7 @@ if CUR_DIR:
 # Execute Pyinstaller
 version_file = version_file.format(
     version,
-    verison_fromat(version)
+    version_format(version)
 )
 
 sepc_file = sepc_file.format(
@@ -180,7 +180,8 @@ sepc_file = sepc_file.format(
 
 iss_file = iss_file.format(
     CUR_DIR,
-    version
+    version,
+    '.'.join(map(str, version_format(version)))
 )
 
 open('tmp.txt', 'w').write(version_file)
@@ -206,6 +207,9 @@ os.rename('dist\\elmocut', app_path)
 os.makedirs(app_path + 'manuf', exist_ok=True)
 shutil.copy('exe\\manuf', app_path + 'manuf\\manuf')
 
+# UPX with elmocut.exe
+os.system(f'upx {app_path}elmocut.exe')
+
 print('>>> Removing unnecessary files')
 ## Remove all platforms dll but qwindows.dll
 for dll in os.listdir(platforms_dlls):
@@ -213,10 +217,16 @@ for dll in os.listdir(platforms_dlls):
         os.remove(platforms_dlls + dll)
 
 ## Remove un needed folders
-for rm in ['dist', 'build', app_path + 'PyQt5\\Qt\\translations', app_path + 'PyQt5\\Qt\\plugins\\imageformats']:
+for rm in [
+  'dist',
+  'build', 
+  app_path + 'PyQt5\\Qt\\translations',
+  app_path + 'PyQt5\\Qt\\plugins\\imageformats',
+  app_path + 'PyQt5\\Qt\\plugins\\iconengines']:
     shutil.rmtree(rm)
 
 print('>>> [Inno Setup] Packaging exe inised Setup file')
+
 # Compile ISS inno setup script
 _ = os.popen('iscc tmp.iss').read()
 
