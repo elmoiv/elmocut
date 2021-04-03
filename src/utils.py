@@ -1,6 +1,7 @@
 from subprocess import check_output, CalledProcessError
 from threading import Thread
 from scapy.all import conf
+from socket import socket
 from manuf import manuf
 
 p = manuf.MacParser()
@@ -69,5 +70,9 @@ def is_connected():
     """
     Checks if there are any IPs in Default Gateway sections
     """
-    output = terminal('ipconfig | findstr "Default Gateway"')
-    return bool([i for i in output if i.isdigit()])
+    connection = socket()
+    try:
+        connection.connect(('1.1.1.1', 80))
+        return True
+    except:
+        return False
