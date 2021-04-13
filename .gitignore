@@ -1,3 +1,6 @@
+# Ignore Patched exe
+data/elmocut.exe
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
