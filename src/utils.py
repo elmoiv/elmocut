@@ -70,9 +70,14 @@ def is_connected():
     """
     Checks if there are any IPs in Default Gateway sections
     """
-    connection = socket()
+    ipconfig_output = terminal('ipconfig | findstr /i gateway')
+    if ipconfig_output != None:
+        return any(i for i in ipconfig_output if i.isdigit())
+    
+    # Alternative way if ipconfig has error in some systems
+    ## Slower than ipconfig workaround
     try:
-        connection.connect(('1.1.1.1', 80))
+        socket().connect(('8.8.8.8', 53))
         return True
     except:
         return False
