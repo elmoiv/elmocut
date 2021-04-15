@@ -129,7 +129,7 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
   <tr>
     <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/scan_hard.png?raw=true" alt="Ping Scan" width="80px"></td>
     <td><samp>Perform Ping Scan</samp></td>
-    <td><samp>Slower than ARP but all devices are detected</samp></td>
+    <td><samp>Slower than ARP but all devices are detected (HIGH CPU USAGE)</samp></td>
   </tr>
   <tr>
     <td><img src="https://github.com/elmoiv/elmocut/blob/main/assets/kill.png?raw=true" alt="ARP Scan" width="80px"></td>
