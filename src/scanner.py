@@ -41,7 +41,11 @@ class Scanner():
         """
         Flush ARP cache
         """
-        terminal('arp -d *', decode=False)
+        arp_cmd = terminal('arp -d *')
+        # Fix: Some systems has older versions of arp.exe
+        # We use netsh instead
+        if 'The parameter is incorrect' in arp_cmd:
+            terminal('netsh interface ip delete arpcache')
 
     def add_me(self):
         """
