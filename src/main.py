@@ -29,7 +29,7 @@ from bridge import ScanThread
 class ElmoCut(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.version = 1.1
+        self.version = '1.0.1'
         self.icon = self.processIcon(app_icon)
 
         # Add window icon
@@ -185,6 +185,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.killer.unkill_all()
         self.settings_window.close()
         self.about_window.close()
+        self.tray_icon.hide()
         self.from_tray = True
         self.close()
 
@@ -218,6 +219,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.about_window.close()
 
         self.hide()
+        self.tray_icon.hide()
 
         QMessageBox.information(
             self,
