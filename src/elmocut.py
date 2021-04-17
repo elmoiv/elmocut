@@ -31,4 +31,5 @@ if __name__ == "__main__":
         GUI.scanner.init()
         GUI.scanner.flush_arp()
         GUI.scanEasy()
+        GUI.UpdateThread_Starter()
         exit(app.exec_())

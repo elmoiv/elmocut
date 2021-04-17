@@ -10,7 +10,7 @@ from ui_main import Ui_MainWindow
 from settings import Settings
 from about import About
 
-from qtools import colored_item
+from qtools import colored_item, MsgType, Buttons
 
 from scanner import Scanner
 from killer import Killer
@@ -24,12 +24,12 @@ from assets import app_icon, \
 from utils_gui import set_settings, get_settings
 from utils import goto, check_connection, is_connected
 
-from bridge import ScanThread
+from bridge import ScanThread, UpdateThread
 
 class ElmoCut(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.version = '1.0.2'
+        self.version = '1.0.3'
         self.icon = self.processIcon(app_icon)
 
         # Add window icon
@@ -46,6 +46,14 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.remember = False
 
         self.from_tray = False
+
+        # Threading
+        self.scan_thread = ScanThread()
+        self.scan_thread.thread_finished.connect(self.ScanThread_Reciever)
+        self.scan_thread.progress.connect(self.pgbar.setValue)
+
+        self.update_thread = UpdateThread()
+        self.update_thread.thread_finished.connect(self.UpdateThread_Reciever)
         
         # We send elmocut to the settings window
         self.settings_window = Settings(self, self.icon)
@@ -53,11 +61,6 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
         self.applySettings()
 
-        # Threading
-        self.scan_thread = ScanThread()
-        self.scan_thread.thread_finished.connect(self.ScanThread_Reciever)
-        self.scan_thread.progress.connect(self.pgbar.setValue)
-        
         # Connect buttons
         self.buttons = [
             (self.btnScanEasy,  self.scanEasy,     scan_easy_icon, 'Arping Scan'),
@@ -398,7 +401,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
     def ScanThread_Starter(self, scan_type=0):
         """
-        self.scan_thread QThread Starter
+        Scan Thread Starter
         """
         if not self.connected():
             return
@@ -425,8 +428,34 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
     def ScanThread_Reciever(self):
         """
-        self.scan_thread QThread results reciever
+        Scan Thread results reciever
         """
         self.centralwidget.setEnabled(True)
         self.pgbar.setVisible(False)
         self.processDevices()
+    
+    def UpdateThread_Starter(self):
+        """
+        Update Thread starter
+        """
+        self.update_thread.start()
+
+    def UpdateThread_Reciever(self):
+        """
+        Update Thread reciever
+        """
+        new_version = self.update_thread.github_version
+        update_url = self.update_thread.url
+        
+        if new_version == 'None':
+            return
+        
+        if new_version != self.version:
+            if MsgType.INFO(
+                self,
+                'elmoCut Update Available',
+                'A new version is available.\n'
+                f'Do you want to download {new_version}?',
+                Buttons.YES | Buttons.NO
+            ) == Buttons.YES:
+                goto(update_url)

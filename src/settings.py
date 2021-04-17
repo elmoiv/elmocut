@@ -24,7 +24,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.spinCount.valueChanged.connect(self.sliderCount.setValue)
         self.btnApply.clicked.connect(self.Apply)
         self.btnDefaults.clicked.connect(self.Defaults)
-        self.btnUpdate.clicked.connect(lambda self: goto('https://github.com/elmoiv/elmocut/releases/latest'))
+        self.btnUpdate.clicked.connect(self.elmocut.update_thread.start)
 
     def Apply(self):
         exe_path = '\\'.join(__file__.split('\\')[:-1] + ['elmocut.exe'])
