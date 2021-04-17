@@ -73,14 +73,14 @@ coll = COLLECT(exe,
                upx_exclude={2},
                name='elmocut')'''
 
-iss_file = '''#define MyAppName "elmoCut"
+iss_file = '''#define MyAppName "{3}"
 #define MyAppVersion "{1}"
 #define MyAppPublisher "elmoiv"
 #define MyAppURL "https://elmoiv.github.io/"
 #define MyAppExeName "elmocut.exe"
 
 [Setup]
-AppId={{{{31430AA0-C0A7-4598-991B-E3B2CD961817}}
+AppId={{{{{4}}}
 AppName={{#MyAppName}}
 AppVersion={1}
 VersionInfoVersion={2}
@@ -93,7 +93,7 @@ DisableDirPage=yes
 DisableProgramGroupPage=yes
 UsedUserAreasWarning=no
 PrivilegesRequiredOverridesAllowed=dialog
-OutputBaseFilename=elmoCut setup x64
+OutputBaseFilename={3} {1} x64
 UninstallDisplayIcon={{app}}\\elmocut.exe
 WizardSmallImageFile={0}exe\\setup_img.bmp
 SolidCompression=yes
@@ -144,10 +144,12 @@ excluded_binaries = ['api-ms-win-core-console-l1-1-0.dll', 'api-ms-win-core-date
 
 excluded_upx = ['qwindows.dll', 'qsvgicon.dll', 'qxdgdesktopportal.dll', 'qwindowsvistastyle.dll']
 
-excluded_modules = ['tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'PIL', 'tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'matplotlib', 'IPython', 'scipy', 'eel', 'cryptography', 'jedi', 'win32com', 'numpy', 'wcwidth', 'win32wnet', 'unicodedata', '_asyncio', '_bz2', '_decimal', '_hashlib', '_lzma', '_multiprocessing', '_overlapped', '_win32sysloader', '_ssl']
+excluded_modules = ['tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'PIL', 'tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'matplotlib', 'IPython', 'scipy', 'eel', 'jedi', 'win32com', 'numpy', 'wcwidth', 'win32wnet', '_asyncio', '_bz2', '_decimal', '_hashlib', '_lzma', '_multiprocessing', '_overlapped', '_win32sysloader', '_cffi_backend', '_openssl', 'cryptography']
 
 is_gui = not bool(input('Press Enter for GUI, or anything for Console: '))
-version = '1.1'
+app_name = 'elmoCut'
+app_guid = '31430AA0-C0A7-4598-991B-E3B2CD961817'
+version = '1.0.3'
 
 import os, shutil, time
 
@@ -181,7 +183,9 @@ sepc_file = sepc_file.format(
 iss_file = iss_file.format(
     CUR_DIR,
     version,
-    '.'.join(map(str, version_format(version)))
+    '.'.join(map(str, version_format(version))),
+    app_name,
+    app_guid
 )
 
 open('tmp.txt', 'w').write(version_file)
