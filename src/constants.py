@@ -14,6 +14,6 @@ DUMMY_ROUTER = {
 
 HKEY_AUTOSTART_PATH = 'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run'
 
-SETTINGS_KEYS = ['dark', 'count', 'autostart', 'minimized', 'remember', 'killed']
+SETTINGS_KEYS = ['dark', 'count', 'autostart', 'minimized', 'remember', 'killed', 'autoupdate']
 
-SETTINGS_VALS = [True,        25,       False,        True,      False,       []]
+SETTINGS_VALS = [True, 25, False, True, False, [], True]

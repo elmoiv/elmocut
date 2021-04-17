@@ -66,6 +66,16 @@ def get_settings(key):
     """
     return import_settings()[key]
 
+def repair_settings():
+    """
+    Rescue elmocut from new settings not found after updates
+    """
+    original = dict(zip(SETTINGS_KEYS, SETTINGS_VALS))
+    s = import_settings()
+    for key in s:
+        original[key] = s[key]
+    export_settings(list(original.values()))
+
 def add_to_startup(exe_path):
     """
     Add elmoCut to autostart

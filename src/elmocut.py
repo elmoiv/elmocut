@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication
 from main import ElmoCut
 from assets import app_icon
 from utils import goto
-from utils_gui import npcap_exists, duplicate_elmocut
+from utils_gui import npcap_exists, duplicate_elmocut, repair_settings
 from qtools import msg_box, Buttons, MsgIcon
 
 from constants import *
@@ -25,6 +25,7 @@ if __name__ == "__main__":
     
     # Run the GUI
     else:
+        repair_settings()
         GUI = ElmoCut()
         GUI.show()
         GUI.resizeEvent()

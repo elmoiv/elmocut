@@ -44,6 +44,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         # Settings props
         self.minimize = True
         self.remember = False
+        self.autoupdate = True
 
         self.from_tray = False
 
@@ -438,7 +439,8 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         Update Thread starter
         """
-        self.update_thread.start()
+        if self.autoupdate:
+            self.update_thread.start()
 
     def UpdateThread_Reciever(self):
         """

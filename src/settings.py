@@ -26,14 +26,15 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.btnDefaults.clicked.connect(self.Defaults)
         self.btnUpdate.clicked.connect(self.elmocut.update_thread.start)
 
-    def Apply(self):
+    def Apply(self, silent_apply=False):
         exe_path = '\\'.join(__file__.split('\\')[:-1] + ['elmocut.exe'])
 
-        count        = self.spinCount.value()
-        is_dark      = self.rdbDark.isChecked()
-        is_autostart = self.chkAutostart.isChecked()
-        is_minimized = self.chkMinimized.isChecked()
-        is_remember  = self.chkRemember.isChecked()
+        count         =  self.spinCount.value()
+        is_dark       =  self.rdbDark.isChecked()
+        is_autostart  =  self.chkAutostart.isChecked()
+        is_minimized  =  self.chkMinimized.isChecked()
+        is_remember   =  self.chkRemember.isChecked()
+        is_autoupdate =  self.chkAutoupdate.isChecked()
        
         if is_autostart:
             add_to_startup(exe_path)
@@ -46,15 +47,26 @@ class Settings(QMainWindow, Ui_MainWindow):
         killed_from_elmo = list(self.elmocut.killer.killed)
         killed_all = list(set(killed_from_json + killed_from_elmo)) * is_remember
 
-        export_settings([is_dark, count, is_autostart, is_minimized, is_remember, killed_all])
+        export_settings(
+            [
+            is_dark,
+            count,
+            is_autostart,
+            is_minimized,
+            is_remember,
+            killed_all,
+            is_autoupdate
+            ]
+        )
 
         self.updateElmocutSettings()
 
-        MsgType.INFO(
-            self,
-            'Apply Settings',
-            'New settings have been applied.'
-        )
+        if not silent_apply:
+            MsgType.INFO(
+                self,
+                'Apply Settings',
+                'New settings have been applied.'
+            )
 
     def Defaults(self):
         if MsgType.WARN(
@@ -73,6 +85,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.currentSettings()
         self.elmocut.minimize = s['minimized']
         self.elmocut.remember = s['remember']
+        self.elmocut.autoupdate = s['autoupdate']
         self.elmocut.scanner.device_count = s['count']
         self.elmocut.setStyleSheet(self.styleSheet())
         self.elmocut.about_window.setStyleSheet(self.styleSheet())
@@ -86,6 +99,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.chkAutostart.setChecked(s['autostart'])
         self.chkMinimized.setChecked(s['minimized'])
         self.chkRemember.setChecked(s['remember'])
+        self.chkAutoupdate.setChecked(s['autoupdate'])
         self.spinCount.setValue(s['count'])
         self.sliderCount.setValue(s['count'])
         self.setStyleSheet(load_stylesheet() if s['dark'] else '')
