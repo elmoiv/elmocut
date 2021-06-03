@@ -98,7 +98,7 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 ## Limitations
 - Can only search for 255 devices (255.255.255.0 subnet masks)
 - Works only on default interface.
-- Both scan types are manaul.
+- Both scan types are manual.
 
 ## Download
 - GitHub:
