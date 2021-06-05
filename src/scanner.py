@@ -1,4 +1,5 @@
 from utils import get_vendor, good_mac, get_my_ip, threaded, terminal
+from concurrent.futures.thread import ThreadPoolExecutor
 from scapy.all import Ether, arping, conf, get_if_addr
 from time import sleep
 from re import findall
@@ -8,6 +9,7 @@ from constants import *
 class Scanner():
     def __init__(self):
         self.device_count = 25
+        self.max_threads = 8
         self.__ping_done = 0
         self.devices = []
         self.old_ips = {}
@@ -164,8 +166,7 @@ class Scanner():
             self.init()
         
         self.generate_ips()
-        for ip in self.ips:
-            self.ping_thread(ip)
+        self.ping_thread_pool()
         
         while self.__ping_done < self.device_count - 1:
             # Add a sleep to overcome High CPU usage
@@ -175,9 +176,18 @@ class Scanner():
         return True
     
     @threaded
-    def ping_thread(self, ip):
+    def ping_thread_pool(self):
         """
-        Sub function for pinging
+        Control maximum threads running at once
+        """
+        with ThreadPoolExecutor(self.max_threads) as executor:
+            for ip in self.ips:
+                executor.submit(self.ping, ip)
+        
+    
+    def ping(self, ip):
+        """
+        Ping a specific ip with native command "ping -n"
         """
         terminal(f'ping -n 1 {ip}', decode=False)
         self.__ping_done += 1

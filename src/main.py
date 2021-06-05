@@ -3,7 +3,7 @@ from pyperclip import copy
 
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QMessageBox, \
                             QMenu, QSystemTrayIcon, QAction
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt
 
 from ui_main import Ui_MainWindow
@@ -29,7 +29,7 @@ from bridge import ScanThread, UpdateThread
 class ElmoCut(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.version = '1.0.3'
+        self.version = '1.0.4'
         self.icon = self.processIcon(app_icon)
 
         # Add window icon
@@ -64,15 +64,15 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
         # Connect buttons
         self.buttons = [
-            (self.btnScanEasy,  self.scanEasy,     scan_easy_icon, 'Arping Scan'),
-            (self.btnScanHard,  self.scanHard,     scan_hard_icon, 'Pinging Scan'),
-            (self.btnKill,      self.kill,         kill_icon,      'Kill selected device'),
-            (self.btnUnkill,    self.unkill,       unkill_icon,    'Un-kill selected device'),
-            (self.btnKillAll,   self.killAll,      killall_icon,   'Kill all devices'),
-            (self.btnUnkillAll, self.unkillAll,    unkillall_icon, 'Un-kill all devices'),
-            (self.btnSettings,  self.openSettings, settings_icon,  'View elmoCut settings'),
-            (self.btnAbout,     self.openAbout,    about_icon,     'About elmoCut')
-            ]
+            (self.btnScanEasy,   self.scanEasy,      scan_easy_icon,  'Arping Scan'),
+            (self.btnScanHard,   self.scanHard,      scan_hard_icon,  'Pinging Scan'),
+            (self.btnKill,       self.kill,          kill_icon,       'Kill selected device'),
+            (self.btnUnkill,     self.unkill,        unkill_icon,     'Un-kill selected device'),
+            (self.btnKillAll,    self.killAll,       killall_icon,    'Kill all devices'),
+            (self.btnUnkillAll,  self.unkillAll,     unkillall_icon,  'Un-kill all devices'),
+            (self.btnSettings,   self.openSettings,  settings_icon,   'View elmoCut settings'),
+            (self.btnAbout,      self.openAbout,     about_icon,      'About elmoCut')
+        ] 
         
         for btn, btn_func, btn_icon, btn_tip in self.buttons:
             btn.setToolTip(btn_tip)
@@ -210,13 +210,13 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             return
         
         # If event is recieved from close X button
-        
+
         ## If minimize is true
         if self.minimize:
             event.ignore()
             self.hide_all()
             return
-        
+
         ## If not kill all and shutdown
         self.killer.unkill_all()
         self.settings_window.close()
@@ -436,10 +436,12 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.processDevices()
     
     def UpdateThread_Starter(self):
+        __import__('gc').collect()
         """
         Update Thread starter
         """
         if self.autoupdate:
+            self.update_thread.prompt_if_latest = False
             self.update_thread.start()
 
     def UpdateThread_Reciever(self):
@@ -461,3 +463,10 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
                 Buttons.YES | Buttons.NO
             ) == Buttons.YES:
                 goto(update_url)
+        
+        if new_version == self.version and self.update_thread.prompt_if_latest:
+            MsgType.INFO(
+                self.settings_window, # Run this within settings window
+                'Check for update',
+                'You have the latest version installed.'
+            )

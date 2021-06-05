@@ -38,6 +38,7 @@ class UpdateThread(QThread):
 
     def __init__(self):
         QThread.__init__(self)
+        self.prompt_if_latest = True # Show "You have the latest version" msg
         self.github_version = 'None'
         self.url = 'https://github.com/elmoiv/elmocut/releases/latest'
 

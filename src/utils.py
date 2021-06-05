@@ -1,7 +1,7 @@
 from subprocess import check_output, CalledProcessError
+from socket import socket, getfqdn, gethostbyname
 from threading import Thread
 from scapy.all import conf
-from socket import socket
 from manuf import manuf
 
 p = manuf.MacParser()
@@ -46,7 +46,7 @@ def get_my_ip():
     If fails: return localhost
     """
     try:
-        return [x[4] for x in conf.route.routes if x[2] != '0.0.0.0'][0]
+        return gethostbyname(getfqdn())
     except IndexError:
         return '127.0.0.1'
 
@@ -72,8 +72,8 @@ def is_connected():
     """
     ipconfig_output = terminal('ipconfig | findstr /i gateway')
     if ipconfig_output != None:
-        return any(i for i in ipconfig_output if i.isdigit())
-    
+        return any(i.isdigit() for i in ipconfig_output)
+
     # Alternative way if ipconfig has error in some systems
     ## Slower than ipconfig workaround
     try:

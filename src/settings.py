@@ -1,6 +1,7 @@
 from utils_gui import import_settings, export_settings, get_settings, \
                       is_admin, add_to_startup, remove_from_startup
 from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtGui import QFont
 from qdarkstyle import load_stylesheet
 from ui_settings import Ui_MainWindow
 from qtools import MsgType, Buttons
@@ -22,14 +23,17 @@ class Settings(QMainWindow, Ui_MainWindow):
 
         self.sliderCount.valueChanged.connect(self.spinCount.setValue)
         self.spinCount.valueChanged.connect(self.sliderCount.setValue)
+        self.sliderThreads.valueChanged.connect(self.spinThreads.setValue)
+        self.spinThreads.valueChanged.connect(self.sliderThreads.setValue)
         self.btnApply.clicked.connect(self.Apply)
         self.btnDefaults.clicked.connect(self.Defaults)
-        self.btnUpdate.clicked.connect(self.elmocut.update_thread.start)
+        self.btnUpdate.clicked.connect(self.checkUpdate)
 
     def Apply(self, silent_apply=False):
         exe_path = '\\'.join(__file__.split('\\')[:-1] + ['elmocut.exe'])
 
         count         =  self.spinCount.value()
+        threads       =  self.spinThreads.value()
         is_dark       =  self.rdbDark.isChecked()
         is_autostart  =  self.chkAutostart.isChecked()
         is_minimized  =  self.chkMinimized.isChecked()
@@ -55,11 +59,14 @@ class Settings(QMainWindow, Ui_MainWindow):
             is_minimized,
             is_remember,
             killed_all,
-            is_autoupdate
+            is_autoupdate,
+            threads
             ]
         )
 
         self.updateElmocutSettings()
+        # Fix horizontal headerfont reverts to normal after applying settings
+        self.elmocut.tableScan.horizontalHeader().setFont(QFont('Courier', 11))
 
         if not silent_apply:
             MsgType.INFO(
@@ -87,6 +94,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.elmocut.remember = s['remember']
         self.elmocut.autoupdate = s['autoupdate']
         self.elmocut.scanner.device_count = s['count']
+        self.elmocut.scanner.max_threads = s['threads']
         self.elmocut.setStyleSheet(self.styleSheet())
         self.elmocut.about_window.setStyleSheet(self.styleSheet())
 
@@ -101,5 +109,11 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.chkRemember.setChecked(s['remember'])
         self.chkAutoupdate.setChecked(s['autoupdate'])
         self.spinCount.setValue(s['count'])
+        self.spinThreads.setValue(s['threads'])
         self.sliderCount.setValue(s['count'])
+        self.sliderThreads.setValue(s['threads'])
         self.setStyleSheet(load_stylesheet() if s['dark'] else '')
+    
+    def checkUpdate(self):
+        self.elmocut.update_thread.prompt_if_latest = True
+        self.elmocut.update_thread.start()
