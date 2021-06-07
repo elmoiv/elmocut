@@ -2,10 +2,11 @@
 - **[New]** Added the ability to control maximum threads:
 
 ![](https://i.imgur.com/Xk1shv7.png)
+- Fixed `Scanner.flush_arp()` not working on older systems.
 - Improved Scanner performance.
 - Improved auto-update checker.
 - Updated [manuf](https://github.com/coolbho3k/manuf) MAC vendors database.
-- Fixed some bugs.
+
 
 ## [1.0.3] - 2021-04-17
 - Added auto-update checker.
