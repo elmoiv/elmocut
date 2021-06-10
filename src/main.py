@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QMessageBox, \
                             QMenu, QSystemTrayIcon, QAction
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import Qt
+from PyQt5.QtWinExtras import QWinTaskbarButton
 
 from ui_main import Ui_MainWindow
 from settings import Settings
@@ -15,11 +16,7 @@ from qtools import colored_item, MsgType, Buttons
 from scanner import Scanner
 from killer import Killer
 
-from assets import app_icon, \
-                   kill_icon, killall_icon, \
-                   unkill_icon, unkillall_icon, \
-                   scan_easy_icon, scan_hard_icon, \
-                   settings_icon, about_icon
+from assets import *
 
 from utils_gui import set_settings, get_settings
 from utils import goto, check_connection, is_connected
@@ -192,6 +189,16 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.tray_icon.hide()
         self.from_tray = True
         self.close()
+
+    def showEvent(self, event):
+        """
+        https://stackoverflow.com/a/60123914/5305953
+        Connect TaskBar icon to progressbar
+        """
+        self.taskbar_button = QWinTaskbarButton()
+        self.taskbar_progress = self.taskbar_button.progress()
+        self.taskbar_button.setWindow(self.windowHandle())
+        self.pgbar.valueChanged.connect(self.taskbar_progress.setValue)
 
     def resizeEvent(self, event=True):
         """
@@ -422,7 +429,9 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         )
         
         self.pgbar.setVisible(True)
+        self.taskbar_progress.setVisible(True)
         self.pgbar.setMaximum(self.scanner.device_count)
+        self.taskbar_progress.setMaximum(self.scanner.device_count)
         self.pgbar.setValue(self.scanner.device_count * (not scan_type))
         
         self.scan_thread.scanner = self.scanner
@@ -435,6 +444,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         self.centralwidget.setEnabled(True)
         self.pgbar.setVisible(False)
+        self.taskbar_progress.setVisible(False)
         self.processDevices()
     
     def UpdateThread_Starter(self):
