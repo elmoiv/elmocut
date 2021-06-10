@@ -15,6 +15,10 @@ class Killer:
         """
         Spoofing victim
         """
+        if victim['mac'] in self.killed:
+            print(victim['mac'], 'is already killed.')
+            return
+        
         self.killed[victim['mac']] = victim
 
         # Cheat Victim
