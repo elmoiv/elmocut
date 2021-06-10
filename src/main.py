@@ -86,7 +86,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.tableScan.cellClicked.connect(self.cellClicked)
         self.tableScan.setColumnCount(4)
         self.tableScan.verticalHeader().setVisible(False)
-        self.tableScan.setHorizontalHeaderLabels(['IP Address','MAC Address','Vendor','Type'])
+        self.tableScan.setHorizontalHeaderLabels(['IP Address', 'MAC Address', 'Vendor', 'Type'])
 
         '''
            System tray icon and it's tray menu
@@ -217,7 +217,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             self.hide_all()
             return
 
-        ## If not kill all and shutdown
+        ## If not, ukill all and shutdown
         self.killer.unkill_all()
         self.settings_window.close()
         self.about_window.close()
@@ -307,6 +307,8 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
         # re-kill paused and update to current devices
         self.killer.rekill_stored(self.scanner.devices)
+        
+        # re-kill saved devices after exit
         for rem_device in self.scanner.devices:
             if rem_device['mac'] in get_settings('killed') * self.remember:
                 self.killer.kill(rem_device)
