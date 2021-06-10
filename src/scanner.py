@@ -99,7 +99,7 @@ class Scanner():
                 continue
             
             # Skip me or duplicated devices
-            if ip == self.my_ip or mac in unique:
+            if mac == self.my_mac or mac in unique:
                 continue
             
             # update same device with new ip
