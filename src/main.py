@@ -57,8 +57,6 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.settings_window = Settings(self, self.icon)
         self.about_window = About(self, self.icon)
 
-        self.applySettings()
-
         # Connect buttons
         self.buttons = [
             (self.btnScanEasy,   self.scanEasy,      scan_easy_icon,  'Arping Scan'),
@@ -115,6 +113,8 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.tray_icon.setContextMenu(tray_menu)
         self.tray_icon.show()
         self.tray_icon.activated.connect(self.tray_clicked)
+
+        self.applySettings()
     
     @staticmethod
     def processIcon(icon_data):
@@ -131,7 +131,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         Prompt when disconnected
         """
-        if is_connected():
+        if is_connected(current_iface=self.scanner.iface):
             return True
         self.log('Connection lost!', 'red')
         QMessageBox.critical(self, 'elmoCut', 'Connection Lost!')
@@ -148,6 +148,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         Open settings window
         """
         self.settings_window.hide()
+        self.settings_window.loadInterfaces()
         self.settings_window.currentSettings()
         self.settings_window.show()
 
@@ -297,8 +298,12 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         status = f'{len(self.scanner.devices) - 2} devices' \
                  f' ({len(self.killer.killed)} killed)'
         
+        status_tray = f'Devices Found: {len(self.scanner.devices) - 2}\n' \
+                      f'Devices Killed: {len(self.killer.killed)}\n' \
+                      f'Interface: {self.scanner.iface.name}'
+        
         self.lblright.setText(status)
-        self.tray_icon.setToolTip(status)
+        self.tray_icon.setToolTip(status_tray)
 
         # Show selected cell data
         self.lblcenter.setText('Nothing Selected')

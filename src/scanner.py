@@ -1,4 +1,4 @@
-from utils import get_vendor, good_mac, get_my_ip, threaded, terminal
+from utils import get_vendor, good_mac, get_my_ip, threaded, terminal, get_default_iface
 from concurrent.futures.thread import ThreadPoolExecutor
 from scapy.all import Ether, arping, conf, get_if_addr
 from time import sleep
@@ -8,6 +8,7 @@ from constants import *
 
 class Scanner():
     def __init__(self):
+        self.iface = get_default_iface()
         self.device_count = 25
         self.max_threads = 8
         self.__ping_done = 0
@@ -27,13 +28,16 @@ class Scanner():
         """
         Intializing Scanner
         """
+        # Refresh Scapy
+        conf.route.resync()
+
         self.router_ip = conf.route.route("0.0.0.0")[2]
         self.router_mac = GLOBAL_MAC
 
-        self.my_ip = get_my_ip()
-        self.my_mac = good_mac(Ether().src)
+        self.my_ip = self.iface.ip
+        self.my_mac = good_mac(self.iface.mac)
         
-        self.perfix = self.router_ip.rsplit(".", 1)[0]
+        self.perfix = self.my_ip.rsplit(".", 1)[0]
         self.generate_ips()
 
         self.add_me()
@@ -137,8 +141,11 @@ class Scanner():
         """
         Showing system arp cache after pinging
         """
-        scan_result = terminal('arp -a')
-        clean_result = findall(rf'({self.perfix}\.\d+)\s+([0-9a-f-]+)\s+dynamic', scan_result)
+        # Correct scan result when working with specific interface
+        scan_result = terminal('arp -a').replace('\n', '-') + '-'
+        iface_specific = ' '.join(findall(rf'Interface: {self.my_ip} (.*)--', scan_result))
+
+        clean_result = findall(rf'({self.perfix}\.\d+)\s+([0-9a-f-]+)\s+dynamic', iface_specific)
         
         self.devices_appender(clean_result)
     
@@ -146,11 +153,16 @@ class Scanner():
         """
         Scan using Scapy arping method 
         """
-        if self.router_mac and self.router_mac == GLOBAL_MAC:
+        if self.router_mac == GLOBAL_MAC:
             self.init()
 
         self.generate_ips()
-        scan_result = arping(f"{self.router_ip}/24", verbose=0, timeout=1)
+        scan_result = arping(
+            f"{self.router_ip}/24",
+            iface=self.iface.name,
+            verbose=0,
+            timeout=1
+        )
         clean_result = [(i[1].psrc, i[1].src) for i in scan_result[0]]
 
         self.devices_appender(clean_result)
@@ -162,7 +174,7 @@ class Scanner():
         """
         self.__ping_done = 0
 
-        if self.router_mac and self.router_mac == GLOBAL_MAC:
+        if self.router_mac == GLOBAL_MAC:
             self.init()
         
         self.generate_ips()
@@ -183,8 +195,7 @@ class Scanner():
         with ThreadPoolExecutor(self.max_threads) as executor:
             for ip in self.ips:
                 executor.submit(self.ping, ip)
-        
-    
+
     def ping(self, ip):
         """
         Ping a specific ip with native command "ping -n"

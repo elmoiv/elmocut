@@ -1,11 +1,12 @@
 from utils_gui import import_settings, export_settings, get_settings, \
-                      is_admin, add_to_startup, remove_from_startup
+                      is_admin, add_to_startup, remove_from_startup, set_settings
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
 from qdarkstyle import load_stylesheet
 from ui_settings import Ui_MainWindow
 from qtools import MsgType, Buttons
-from utils import goto
+from utils import goto, get_ifaces, get_default_iface, get_iface_by_name
 
 class Settings(QMainWindow, Ui_MainWindow):
     def __init__(self, elmocut, icon):
@@ -17,6 +18,8 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.setWindowIcon(icon)
         self.setupUi(self)
         self.setFixedSize(self.size())
+
+        self.loadInterfaces()
 
         # Apply old settings on open
         self.currentSettings()
@@ -39,6 +42,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         is_minimized  =  self.chkMinimized.isChecked()
         is_remember   =  self.chkRemember.isChecked()
         is_autoupdate =  self.chkAutoupdate.isChecked()
+        iface         =  self.comboInterface.currentText()
        
         if is_autostart:
             add_to_startup(exe_path)
@@ -60,10 +64,12 @@ class Settings(QMainWindow, Ui_MainWindow):
             is_remember,
             killed_all,
             is_autoupdate,
-            threads
+            threads,
+            iface
             ]
         )
 
+        self.elmocut.iface = get_iface_by_name(iface)
         self.updateElmocutSettings()
         # Fix horizontal headerfont reverts to normal after applying settings
         self.elmocut.tableScan.horizontalHeader().setFont(QFont('Courier', 11))
@@ -90,20 +96,27 @@ class Settings(QMainWindow, Ui_MainWindow):
     def updateElmocutSettings(self):
         s = import_settings()
         self.currentSettings()
+        self.elmocut.scanner.__init__()
+        self.elmocut.scanner.init()
         self.elmocut.minimize = s['minimized']
         self.elmocut.remember = s['remember']
         self.elmocut.autoupdate = s['autoupdate']
         self.elmocut.scanner.device_count = s['count']
         self.elmocut.scanner.max_threads = s['threads']
+        self.elmocut.scanner.iface = get_iface_by_name(s['iface'])
+        self.elmocut.killer.iface = get_iface_by_name(s['iface'])
         self.elmocut.setStyleSheet(self.styleSheet())
         self.elmocut.about_window.setStyleSheet(self.styleSheet())
 
+        status_tray = f'Devices Found: {len(self.elmocut.scanner.devices) - 2}\n' \
+                      f'Devices Killed: {len(self.elmocut.killer.killed)}\n' \
+                      f'Interface: {self.elmocut.scanner.iface.name}'
+
+        self.elmocut.tray_icon.setToolTip(status_tray)
+
     def currentSettings(self):
         s = import_settings()
-        if s['dark']:
-            self.rdbDark.setChecked(True)
-        else:
-            self.rdbLight.setChecked(True)
+        [self.rdbLight, self.rdbDark][s['dark']].setChecked(True)
         self.chkAutostart.setChecked(s['autostart'])
         self.chkMinimized.setChecked(s['minimized'])
         self.chkRemember.setChecked(s['remember'])
@@ -112,8 +125,22 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.spinThreads.setValue(s['threads'])
         self.sliderCount.setValue(s['count'])
         self.sliderThreads.setValue(s['threads'])
+        
+        if not s['iface']:
+            set_settings('iface', get_default_iface().name)
+            s = import_settings()
+        
+        index = self.comboInterface.findText(s['iface'], Qt.MatchFixedString)
+        self.comboInterface.setCurrentIndex(index * (index >= 0))
+        
         self.setStyleSheet(load_stylesheet() if s['dark'] else '')
     
     def checkUpdate(self):
         self.elmocut.update_thread.prompt_if_latest = True
         self.elmocut.update_thread.start()
+    
+    def loadInterfaces(self):
+        self.comboInterface.clear()
+        self.comboInterface.addItems(
+            [iface.name for iface in get_ifaces()]
+        )

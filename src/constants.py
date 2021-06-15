@@ -12,8 +12,10 @@ DUMMY_ROUTER = {
     'admin': True
 }
 
+DUMMY_IFACE = {'name': 'NULL', 'mac': GLOBAL_MAC, 'guid': 'NULL', 'ips': ['0.0.0.0']}
+
 HKEY_AUTOSTART_PATH = 'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run'
 
-SETTINGS_KEYS = ['dark', 'count', 'autostart', 'minimized', 'remember', 'killed', 'autoupdate', 'threads']
+SETTINGS_KEYS = ['dark', 'count', 'autostart', 'minimized', 'remember', 'killed', 'autoupdate', 'threads', 'iface']
 
-SETTINGS_VALS = [True, 25, False, True, False, [], True, 5]
+SETTINGS_VALS = [True, 25, False, True, False, [], True, 5, '']

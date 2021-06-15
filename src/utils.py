@@ -1,8 +1,10 @@
+from scapy.all import conf, get_if_list, get_windows_if_list, get_if_hwaddr
 from subprocess import check_output, CalledProcessError
 from socket import socket, getfqdn, gethostbyname
 from threading import Thread
-from scapy.all import conf
+from ifaces import NetFace
 from manuf import manuf
+from constants import *
 
 p = manuf.MacParser()
 
@@ -66,10 +68,38 @@ def check_connection(func):
             return func(args[0])
     return wrapper
 
-def is_connected():
+def get_ifaces():
+    """
+    Get current working interfaces
+    """
+    pcap = {net.split('_')[-1] for net in get_if_list()}
+    for iface in get_windows_if_list():
+        if iface['guid'] in pcap: 
+            yield NetFace(iface)
+
+def get_default_iface():
+    """
+    Get default pcap interface
+    """
+    for iface in get_ifaces():
+        if iface.guid in str(conf.iface):
+            return iface
+    return NetFace(DUMMY_IFACE)
+
+def get_iface_by_name(name):
+    conf.route.resync()
+    for iface in get_ifaces():
+        if iface.name == name:
+            return iface
+    return get_default_iface()
+
+def is_connected(current_iface=get_default_iface()):
     """
     Checks if there are any IPs in Default Gateway sections
     """
+    if current_iface.name == 'NULL':
+        return False
+
     ipconfig_output = terminal('ipconfig | findstr /i gateway')
     if ipconfig_output != None:
         return any(i.isdigit() for i in ipconfig_output)
