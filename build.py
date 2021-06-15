@@ -16,12 +16,12 @@ VSVersionInfo(
       StringTable(
         u'040904B0',
         [StringStruct(u'CompanyName', u'elmoiv Apps'),
-        StringStruct(u'FileDescription', u'elmoCut'),
+        StringStruct(u'FileDescription', u'{2}'),
         StringStruct(u'FileVersion', u'{0}'),
-        StringStruct(u'InternalName', u'elmocut'),
+        StringStruct(u'InternalName', u'{2}'),
         StringStruct(u'LegalCopyright', u'Khaled El-Morshedy (elmoiv) 2015-2021'),
-        StringStruct(u'OriginalFilename', u'elmocut.exe'),
-        StringStruct(u'ProductName', u'elmoCut'),
+        StringStruct(u'OriginalFilename', u'{2}.exe'),
+        StringStruct(u'ProductName', u'{2}'),
         StringStruct(u'ProductVersion', u'{0}')])
       ]), 
     VarFileInfo([VarStruct(u'Translation', [1033, 1200])])
@@ -34,8 +34,8 @@ sepc_file = '''# -*- mode: python ; coding: utf-8 -*-
 block_cipher = None
 
 
-a = Analysis(['{0}src\\\\elmocut.py'],
-             pathex=['{0}elmocut'],
+a = Analysis(['{0}src\\\\{5}.py'],
+             pathex=['{0}{5}'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -57,7 +57,7 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='elmocut',
+          name='{5}',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
@@ -71,13 +71,13 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude={2},
-               name='elmocut')'''
+               name='{5}')'''
 
 iss_file = '''#define MyAppName "{3}"
 #define MyAppVersion "{1}"
 #define MyAppPublisher "elmoiv"
 #define MyAppURL "https://elmoiv.github.io/"
-#define MyAppExeName "elmocut.exe"
+#define MyAppExeName "{3}.exe"
 
 [Setup]
 AppId={{{{{4}}}
@@ -94,7 +94,7 @@ DisableProgramGroupPage=yes
 UsedUserAreasWarning=no
 PrivilegesRequiredOverridesAllowed=dialog
 OutputBaseFilename={3} {1} x64
-UninstallDisplayIcon={{app}}\\elmocut.exe
+UninstallDisplayIcon={{app}}\\{3}.exe
 WizardSmallImageFile={0}exe\\setup_img.bmp
 SolidCompression=yes
 Compression=lzma2/ultra64
@@ -111,26 +111,7 @@ Name: "desktopicon"; Description: "{{cm:CreateDesktopIcon}}"; GroupDescription: 
 Name: "quicklaunchicon"; Description: "{{cm:CreateQuickLaunchIcon}}"; GroupDescription: "{{cm:AdditionalIcons}}"; Flags: unchecked; OnlyBelowVersion: 6.1; Check: not IsAdminInstallMode
 
 [Files]
-Source: "{0}output\\elmocut\\elmocut.exe"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\_ctypes.pyd"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\_queue.pyd"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\_socket.pyd"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\base_library.zip"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\elmocut.exe.manifest"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\msvcp140.dll"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\pyexpat.pyd"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\python3.dll"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\python37.dll"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\pywintypes37.dll"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\Qt5Core.dll"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\Qt5Gui.dll"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\Qt5Widgets.dll"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\select.pyd"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\VCRUNTIME140.dll"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\win32api.pyd"; DestDir: "{{app}}"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\PyQt5\\*"; DestDir: "{{app}}\\PyQt5"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{0}output\\elmocut\\manuf\\*"; DestDir: "{{app}}\\manuf"; Flags: ignoreversion
-Source: "{0}output\\elmocut\\include\\*"; DestDir: "{{app}}\\include"; Flags: ignoreversion
+{5}
 
 [Icons]
 Name: "{{autoprograms}}\\{{#MyAppName}}"; Filename: "{{app}}\\{{#MyAppExeName}}"
@@ -140,7 +121,7 @@ Name: "{{userappdata}}\\Microsoft\\Internet Explorer\\Quick Launch\\{{#MyAppName
 [Run]
 Filename: "{{app}}\\{{#MyAppExeName}}"; Description: "{{cm:LaunchProgram,{{#StringChange(MyAppName, '&', '&&')}}}}"; Flags: nowait postinstall skipifsilent'''
 
-excluded_binaries = ['api-ms-win-core-console-l1-1-0.dll', 'api-ms-win-core-datetime-l1-1-0.dll', 'api-ms-win-core-debug-l1-1-0.dll', 'api-ms-win-core-errorhandling-l1-1-0.dll', 'api-ms-win-core-file-l1-1-0.dll', 'api-ms-win-core-file-l1-2-0.dll', 'api-ms-win-core-file-l2-1-0.dll', 'api-ms-win-core-handle-l1-1-0.dll', 'api-ms-win-core-heap-l1-1-0.dll', 'api-ms-win-core-interlocked-l1-1-0.dll', 'api-ms-win-core-libraryloader-l1-1-0.dll', 'api-ms-win-core-localization-l1-2-0.dll', 'api-ms-win-core-memory-l1-1-0.dll', 'api-ms-win-core-namedpipe-l1-1-0.dll', 'api-ms-win-core-processenvironment-l1-1-0.dll', 'api-ms-win-core-processthreads-l1-1-0.dll', 'api-ms-win-core-processthreads-l1-1-1.dll', 'api-ms-win-core-profile-l1-1-0.dll', 'api-ms-win-core-rtlsupport-l1-1-0.dll', 'api-ms-win-core-string-l1-1-0.dll', 'api-ms-win-core-synch-l1-1-0.dll', 'api-ms-win-core-synch-l1-2-0.dll', 'api-ms-win-core-sysinfo-l1-1-0.dll', 'api-ms-win-core-timezone-l1-1-0.dll', 'api-ms-win-core-util-l1-1-0.dll', 'api-ms-win-crt-conio-l1-1-0.dll', 'api-ms-win-crt-convert-l1-1-0.dll', 'api-ms-win-crt-environment-l1-1-0.dll', 'api-ms-win-crt-filesystem-l1-1-0.dll', 'api-ms-win-crt-heap-l1-1-0.dll', 'api-ms-win-crt-locale-l1-1-0.dll', 'api-ms-win-crt-math-l1-1-0.dll', 'api-ms-win-crt-multibyte-l1-1-0.dll', 'api-ms-win-crt-process-l1-1-0.dll', 'api-ms-win-crt-runtime-l1-1-0.dll', 'api-ms-win-crt-stdio-l1-1-0.dll', 'api-ms-win-crt-string-l1-1-0.dll', 'api-ms-win-crt-time-l1-1-0.dll', 'api-ms-win-crt-utility-l1-1-0.dll', 'd3dcompiler_47.dll', 'libEGL.dll', 'libGLESv2.dll', 'opengl32sw.dll', 'Qt5DBus.dll', 'Qt5Network.dll', 'Qt5Qml.dll', 'Qt5Quick.dll', 'Qt5Svg.dll', 'Qt5WebSockets.dll', 'ucrtbase.dll']
+excluded_binaries = ['api-ms-win-core-console-l1-1-0.dll', 'api-ms-win-core-datetime-l1-1-0.dll', 'api-ms-win-core-debug-l1-1-0.dll', 'api-ms-win-core-errorhandling-l1-1-0.dll', 'api-ms-win-core-file-l1-1-0.dll', 'api-ms-win-core-file-l1-2-0.dll', 'api-ms-win-core-file-l2-1-0.dll', 'api-ms-win-core-handle-l1-1-0.dll', 'api-ms-win-core-heap-l1-1-0.dll', 'api-ms-win-core-interlocked-l1-1-0.dll', 'api-ms-win-core-libraryloader-l1-1-0.dll', 'api-ms-win-core-localization-l1-2-0.dll', 'api-ms-win-core-memory-l1-1-0.dll', 'api-ms-win-core-namedpipe-l1-1-0.dll', 'api-ms-win-core-processenvironment-l1-1-0.dll', 'api-ms-win-core-processthreads-l1-1-0.dll', 'api-ms-win-core-processthreads-l1-1-1.dll', 'api-ms-win-core-profile-l1-1-0.dll', 'api-ms-win-core-rtlsupport-l1-1-0.dll', 'api-ms-win-core-string-l1-1-0.dll', 'api-ms-win-core-synch-l1-1-0.dll', 'api-ms-win-core-synch-l1-2-0.dll', 'api-ms-win-core-sysinfo-l1-1-0.dll', 'api-ms-win-core-timezone-l1-1-0.dll', 'api-ms-win-core-util-l1-1-0.dll', 'api-ms-win-crt-conio-l1-1-0.dll', 'api-ms-win-crt-convert-l1-1-0.dll', 'api-ms-win-crt-environment-l1-1-0.dll', 'api-ms-win-crt-filesystem-l1-1-0.dll', 'api-ms-win-crt-heap-l1-1-0.dll', 'api-ms-win-crt-locale-l1-1-0.dll', 'api-ms-win-crt-math-l1-1-0.dll', 'api-ms-win-crt-multibyte-l1-1-0.dll', 'api-ms-win-crt-process-l1-1-0.dll', 'api-ms-win-crt-runtime-l1-1-0.dll', 'api-ms-win-crt-stdio-l1-1-0.dll', 'api-ms-win-crt-string-l1-1-0.dll', 'api-ms-win-crt-time-l1-1-0.dll', 'api-ms-win-crt-utility-l1-1-0.dll', 'd3dcompiler_47.dll', 'libEGL.dll', 'libGLESv2.dll', 'opengl32sw.dll', 'Qt5DBus.dll', 'Qt5Network.dll', 'Qt5Qml.dll', 'Qt5Quick.dll', 'Qt5Svg.dll', 'Qt5WebSockets.dll', 'ucrtbase.dll', 'VCRUNTIME140_1.dll', 'Qt5QmlModels.dll', 'MSVCP140_1.dll']
 
 excluded_upx = ['qwindows.dll', 'qsvgicon.dll', 'qxdgdesktopportal.dll', 'qwindowsvistastyle.dll']
 
@@ -148,10 +129,19 @@ excluded_modules = ['tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'PIL
 
 is_gui = not bool(input('Press Enter for GUI, or anything for Console: '))
 app_name = 'elmoCut'
-app_guid = ''
-version = '1.0.3'
+app_guid = '31430AA0-C0A7-4598-991B-E3B2CD961817'
+version = '1.0.4'
 
-import os, shutil, time
+import os, shutil, time, re
+
+# Auto update version in main.py
+src_main = open('src\\main.py').read()
+new_main = re.sub(
+              r"self.version = '(\d+\.\d+\.\d+)'",
+              f"self.version = '{version}'", 
+              src_main
+          )
+open('src\\main.py', 'w').write(new_main)
 
 def version_format(s):
     # Convert xx.xx.xx.xx -> (xx, xx, xx, xx)
@@ -169,7 +159,8 @@ if CUR_DIR:
 # Execute Pyinstaller
 version_file = version_file.format(
     version,
-    version_format(version)
+    version_format(version),
+    app_name
 )
 
 sepc_file = sepc_file.format(
@@ -177,27 +168,20 @@ sepc_file = sepc_file.format(
     excluded_binaries,
     excluded_upx,
     excluded_modules,
-    not is_gui
-)
-
-iss_file = iss_file.format(
-    CUR_DIR,
-    version,
-    '.'.join(map(str, version_format(version))),
-    app_name,
-    app_guid
+    not is_gui,
+    app_name
 )
 
 open('tmp.txt', 'w').write(version_file)
 open('tmp.spec', 'w').write(sepc_file)
-open('tmp.iss', 'w').write(iss_file)
 
 start = time.time()
 
 print('>>> [PyInstaller] Converting project to exe')
 os.system('pyinstaller tmp.spec --log-level "ERROR" --noconfirm')
 
-app_path = 'output\\elmocut\\'
+app_path = f'output\\{app_name}\\'
+
 platforms_dlls = app_path + 'PyQt5\\Qt\\plugins\\platforms\\'
 
 ## Remove previous builds
@@ -205,14 +189,19 @@ if os.path.exists(app_path):
     shutil.rmtree(app_path)
 
 os.makedirs('output', exist_ok=True)
+os.rename('dist\\' + app_name, app_path)
 
-## Move manuf mac database
-os.rename('dist\\elmocut', app_path)
+# Compiling restart.c to restart.exe
+print('>>> [GCC] Compiling restart.c to restart.exe')
+os.system(f'gcc src\\restart.c -o {app_path}restart.exe')
+
+# Moving Manuf to output
 os.makedirs(app_path + 'manuf', exist_ok=True)
 shutil.copy('exe\\manuf', app_path + 'manuf\\manuf')
 
-# UPX with elmocut.exe
-os.system(f'upx {app_path}elmocut.exe')
+# UPX with Executable and restart.exe
+os.system(f'upx {app_path}{app_name}.exe')
+os.system(f'upx {app_path}restart.exe')
 
 print('>>> Removing unnecessary files')
 ## Remove all platforms dll but qwindows.dll
@@ -228,6 +217,29 @@ for rm in [
   app_path + 'PyQt5\\Qt\\plugins\\imageformats',
   app_path + 'PyQt5\\Qt\\plugins\\iconengines']:
     shutil.rmtree(rm)
+
+# Dynamically add files list to iss file
+files_list = []
+iss_cmd = 'Source: "{}"; DestDir: "{{app}}{}"; Flags: ignoreversion '
+for item in os.listdir(app_path):
+    if os.path.isdir(app_path + item):
+        if any(os.path.isdir(f'{app_path}{item}\\{inner}') for inner in os.listdir(app_path + item)):
+            files_list.append(iss_cmd.format(app_path + item + '\\*', f'\\{item}') + 'recursesubdirs createallsubdirs')
+        else:
+            files_list.append(iss_cmd.format(app_path + item + '\\*', f'\\{item}'))
+    else:
+        files_list.append(iss_cmd.format(app_path + item, ''))
+
+iss_file = iss_file.format(
+    CUR_DIR,
+    version,
+    '.'.join(map(str, version_format(version))),
+    app_name,
+    app_guid,
+    '\n'.join(files_list)
+)
+
+open('tmp.iss', 'w').write(iss_file)
 
 print('>>> [Inno Setup] Packaging exe inised Setup file')
 
