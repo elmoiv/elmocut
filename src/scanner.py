@@ -29,8 +29,6 @@ class Scanner():
         Intializing Scanner
         """
         # Refresh Scapy
-        conf.route.resync()
-
         self.router_ip = conf.route.route("0.0.0.0")[2]
         self.router_mac = GLOBAL_MAC
 

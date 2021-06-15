@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt
 from qdarkstyle import load_stylesheet
 from ui_settings import Ui_MainWindow
 from qtools import MsgType, Buttons
-from utils import goto, get_ifaces, get_default_iface, get_iface_by_name
+from utils import goto, get_ifaces, get_default_iface, get_iface_by_name, terminal
 
 class Settings(QMainWindow, Ui_MainWindow):
     def __init__(self, elmocut, icon):
@@ -69,6 +69,8 @@ class Settings(QMainWindow, Ui_MainWindow):
             ]
         )
 
+        old_iface = self.elmocut.scanner.iface.name
+        
         self.elmocut.iface = get_iface_by_name(iface)
         self.updateElmocutSettings()
         # Fix horizontal headerfont reverts to normal after applying settings
@@ -80,6 +82,17 @@ class Settings(QMainWindow, Ui_MainWindow):
                 'Apply Settings',
                 'New settings have been applied.'
             )
+        
+        if old_iface != iface:
+            MsgType.INFO(
+                self,
+                'Interface Changed',
+                'elmoCut will restart to apply new interface.'
+            )
+
+            # Restart elmoCut via restart.exe
+            __import__('os').system('start "" restart.exe')
+            self.elmocut.quit_all()
 
     def Defaults(self):
         if MsgType.WARN(
@@ -96,15 +109,19 @@ class Settings(QMainWindow, Ui_MainWindow):
     def updateElmocutSettings(self):
         s = import_settings()
         self.currentSettings()
+        
         self.elmocut.scanner.__init__()
         self.elmocut.scanner.init()
+        
         self.elmocut.minimize = s['minimized']
         self.elmocut.remember = s['remember']
         self.elmocut.autoupdate = s['autoupdate']
         self.elmocut.scanner.device_count = s['count']
         self.elmocut.scanner.max_threads = s['threads']
+        
         self.elmocut.scanner.iface = get_iface_by_name(s['iface'])
         self.elmocut.killer.iface = get_iface_by_name(s['iface'])
+        
         self.elmocut.setStyleSheet(self.styleSheet())
         self.elmocut.about_window.setStyleSheet(self.styleSheet())
 
