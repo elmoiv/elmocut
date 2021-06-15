@@ -89,6 +89,7 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 
 ## Features
 - Clean UI.
+- Switch between available interfaces.
 - One click to block all devices.
 - Re-kill devices that changed their ip during block.
 - Remember killed devices before exit.
@@ -97,7 +98,6 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 
 ## Limitations
 - Can only search for 255 devices (255.255.255.0 subnet masks)
-- Works only on default interface.
 - Both scan types are manual.
 
 ## Download
@@ -171,6 +171,7 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 ## Build
  - **Required**:
     - PyInstaller: `pip install pyinstaller`
+    - MinGW-w64 gcc compiler: [Download](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download)
  - **Optionals**:
     - UPX: [Download](https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win64.zip)
     - Inno Setup: [Download](https://files.jrsoftware.org/is/6/innosetup-6.0.3.exe)
