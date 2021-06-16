@@ -135,13 +135,13 @@ version = '1.0.4'
 import os, shutil, time, re
 
 # Auto update version in main.py
-src_main = open('src\\main.py').read()
+src_main = open('src\\gui\\main.py').read()
 new_main = re.sub(
               r"self.version = '(\d+\.\d+\.\d+)'",
               f"self.version = '{version}'", 
               src_main
           )
-open('src\\main.py', 'w').write(new_main)
+open('src\\gui\\main.py', 'w').write(new_main)
 
 def version_format(s):
     # Convert xx.xx.xx.xx -> (xx, xx, xx, xx)
@@ -193,7 +193,7 @@ os.rename('dist\\' + app_name, app_path)
 
 # Compiling restart.c to restart.exe
 print('>>> [GCC] Compiling restart.c to restart.exe')
-os.system(f'gcc src\\restart.c -o {app_path}restart.exe')
+os.system(f'gcc src\\tools\\restart.c -o {app_path}restart.exe')
 
 # Moving Manuf to output
 os.makedirs(app_path + 'manuf', exist_ok=True)

@@ -1,12 +1,15 @@
-from utils_gui import import_settings, export_settings, get_settings, \
-                      is_admin, add_to_startup, remove_from_startup, set_settings
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 from qdarkstyle import load_stylesheet
-from ui_settings import Ui_MainWindow
-from qtools import MsgType, Buttons
-from utils import goto, get_ifaces, get_default_iface, get_iface_by_name, terminal
+
+from tools.utils_gui import import_settings, export_settings, get_settings, \
+                      is_admin, add_to_startup, remove_from_startup, set_settings
+from tools.qtools import MsgType, Buttons
+from tools.utils import goto, get_ifaces, get_default_iface, get_iface_by_name, terminal
+
+from ui.ui_settings import Ui_MainWindow
+
 
 class Settings(QMainWindow, Ui_MainWindow):
     def __init__(self, elmocut, icon):

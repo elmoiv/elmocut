@@ -18,4 +18,4 @@ HKEY_AUTOSTART_PATH = 'SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run'
 
 SETTINGS_KEYS = ['dark', 'count', 'autostart', 'minimized', 'remember', 'killed', 'autoupdate', 'threads', 'iface']
 
-SETTINGS_VALS = [True, 25, False, True, False, [], True, 5, '']
+SETTINGS_VALS = [True, 25, False, True, False, [], True, 12, '']

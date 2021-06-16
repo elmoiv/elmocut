@@ -1,9 +1,9 @@
 from os import path, makedirs, environ
 from json import dump, load, JSONDecodeError
-from utils import terminal
 import ctypes
 import winreg
 
+from tools.utils import terminal
 from constants import *
 
 docs = path.join(environ['USERPROFILE'], 'Documents', 'elmocut')

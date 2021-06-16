@@ -1,8 +1,10 @@
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import pyqtSignal, QEvent, QObject
 from PyQt5.QtGui import QPixmap
-from ui_about import Ui_MainWindow
-from utils import goto
+
+from ui.ui_about import Ui_MainWindow
+
+from tools.utils import goto
 
 from assets import facebook_icon, twitter_icon, linkedin_icon, github_icon, app_icon
 

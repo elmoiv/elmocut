@@ -1,9 +1,9 @@
-from utils import get_vendor, good_mac, get_my_ip, threaded, terminal, get_default_iface
 from concurrent.futures.thread import ThreadPoolExecutor
 from scapy.all import Ether, arping, conf, get_if_addr
 from time import sleep
 from re import findall
 
+from tools.utils import get_vendor, good_mac, get_my_ip, threaded, terminal, get_default_iface
 from constants import *
 
 class Scanner():

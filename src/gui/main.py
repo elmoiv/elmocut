@@ -7,19 +7,19 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import Qt
 from PyQt5.QtWinExtras import QWinTaskbarButton
 
-from ui_main import Ui_MainWindow
-from settings import Settings
-from about import About
+from ui.ui_main import Ui_MainWindow
 
-from qtools import colored_item, MsgType, Buttons
+from gui.settings import Settings
+from gui.about import About
 
-from scanner import Scanner
-from killer import Killer
+from networking.scanner import Scanner
+from networking.killer import Killer
+
+from tools.qtools import colored_item, MsgType, Buttons
+from tools.utils_gui import set_settings, get_settings
+from tools.utils import goto, check_connection, is_connected
 
 from assets import *
-
-from utils_gui import set_settings, get_settings
-from utils import goto, check_connection, is_connected
 
 from bridge import ScanThread, UpdateThread
 

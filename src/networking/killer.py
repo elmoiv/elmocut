@@ -1,7 +1,7 @@
 from scapy.all import ARP, send
-from utils import threaded, get_default_iface
 from time import sleep
 
+from tools.utils import threaded, get_default_iface
 from constants import *
 
 class Killer:
