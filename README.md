@@ -171,7 +171,7 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 ## Build
  - **Required**:
     - PyInstaller: `pip install pyinstaller`
-    - MinGW-w64 gcc compiler: [Download](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download)
+    - MinGW-w64 gcc compiler: [Download](https://netix.dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe)
  - **Optionals**:
     - UPX: [Download](https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win64.zip)
     - Inno Setup: [Download](https://files.jrsoftware.org/is/6/innosetup-6.0.3.exe)
