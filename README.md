@@ -89,7 +89,7 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 
 ## Features
 - Clean UI.
-- Switch between available interfaces.
+- **[Coming Soon]** Switch between available interfaces.
 - One click to block all devices.
 - Re-kill devices that changed their ip during block.
 - Remember killed devices before exit.
