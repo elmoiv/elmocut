@@ -10,7 +10,7 @@ class Killer:
         self.router = router
         self.killed = {}
         self.storage = {}
-
+    
     @threaded
     def kill(self, victim, wait_after=1):
         """
