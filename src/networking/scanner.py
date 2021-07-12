@@ -3,7 +3,7 @@ from scapy.all import Ether, arping, conf, get_if_addr
 from time import sleep
 from re import findall
 
-from tools.utils import get_vendor, good_mac, get_my_ip, threaded, terminal, get_default_iface
+from tools.utils import *
 from constants import *
 
 class Scanner():
@@ -28,18 +28,17 @@ class Scanner():
         """
         Intializing Scanner
         """
-        # Refresh Scapy
-        self.router_ip = conf.route.route("0.0.0.0")[2]
-        self.router_mac = GLOBAL_MAC
+        self.iface = get_iface_by_name(self.iface.name)
+        self.devices = []
+
+        self.router_ip = get_gateway_ip(self.iface.name)
+        self.router_mac = get_gateway_mac(self.iface.ip, self.router_ip)
 
         self.my_ip = self.iface.ip
         self.my_mac = good_mac(self.iface.mac)
         
         self.perfix = self.my_ip.rsplit(".", 1)[0]
         self.generate_ips()
-
-        self.add_me()
-        self.add_router()
     
     def flush_arp(self):
         """
@@ -71,7 +70,7 @@ class Scanner():
         """
         self.router = {
             'ip':       self.router_ip,
-            'mac':      good_mac(self.router_mac),
+            'mac':      self.router_mac,
             'vendor':   get_vendor(self.router_mac),
             'type':     'Router',
             'admin':    True
@@ -95,13 +94,8 @@ class Scanner():
         for ip, mac in scan_result:
             mac = good_mac(mac)
 
-            # Store gateway
-            if ip == self.router_ip:
-                self.router_mac = mac
-                continue
-            
-            # Skip me or duplicated devices
-            if mac == self.my_mac or mac in unique:
+            # Skip me or router and duplicated devices
+            if ip in [self.router_ip, self.my_ip] or mac in unique:
                 continue
             
             # update same device with new ip
@@ -112,7 +106,7 @@ class Scanner():
             self.devices.append(
                 {
                     'ip':     ip,
-                    'mac':    good_mac(mac),
+                    'mac':    mac,
                     'vendor': get_vendor(mac),
                     'type':   'User',
                     'admin':  False
@@ -140,19 +134,15 @@ class Scanner():
         Showing system arp cache after pinging
         """
         # Correct scan result when working with specific interface
-        scan_result = terminal('arp -a').replace('\n', '-') + '-'
-        iface_specific = ' '.join(findall(rf'Interface: {self.my_ip} (.*)--', scan_result))
-
-        clean_result = findall(rf'({self.perfix}\.\d+)\s+([0-9a-f-]+)\s+dynamic', iface_specific)
-        
+        scan_result = terminal(f'arp -a -N {self.my_ip} | findstr dynamic')
+        clean_result = [line.split()[:2] for line in scan_result.split('\n') if line.split()]
         self.devices_appender(clean_result)
     
     def arp_scan(self):
         """
         Scan using Scapy arping method 
         """
-        if self.router_mac == GLOBAL_MAC:
-            self.init()
+        self.init()
 
         self.generate_ips()
         scan_result = arping(
@@ -170,10 +160,8 @@ class Scanner():
         Ping all devices at once [CPU Killing function]
            (All Threads will run at the same tine)
         """
+        self.init()
         self.__ping_done = 0
-
-        if self.router_mac == GLOBAL_MAC:
-            self.init()
         
         self.generate_ips()
         self.ping_thread_pool()
@@ -200,3 +188,23 @@ class Scanner():
         """
         terminal(f'ping -n 1 {ip}', decode=False)
         self.__ping_done += 1
+    
+    def print_report(self):
+        a = terminal('netsh wlan show all', decode=1)[2:-1].replace('\\n', '\n').replace('\\r', '\r')
+        c = f'''---- Interface:
+
+{self.iface}
+
+---- ipconfig command:
+
+{terminal('ipconfig')}
+
+---- arp -a command:
+
+{terminal('arp -a')}
+
+---- netsh wlan show all command:
+
+{a}'''
+
+        open('elmocut_info.log', 'w').write(c)
