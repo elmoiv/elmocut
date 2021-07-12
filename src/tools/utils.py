@@ -43,15 +43,20 @@ def good_mac(mac):
     """
     return mac.upper().replace('-', ':')
 
-def get_my_ip():
+def get_gateway_ip(iface_name):
     """
-    Try to extract ip of this device
-    If fails: return localhost
+    Get Gateway IP if connected else None
     """
+    response = terminal('netsh interface ip show address '
+                      f'"{iface_name}" | findstr /i default')
+    return response.split()[-1] if response else '0.0.0.0'
+
+def get_gateway_mac(iface_ip, router_ip):
+    response = terminal(f'arp -a {router_ip} -N {iface_ip} | findstr dynamic')
     try:
-        return gethostbyname(getfqdn())
-    except IndexError:
-        return '127.0.0.1'
+        return good_mac(response.split()[1])
+    except:
+        return GLOBAL_MAC
 
 def goto(url):
     """
