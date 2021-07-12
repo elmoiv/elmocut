@@ -34,7 +34,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.btnApply.clicked.connect(self.Apply)
         self.btnDefaults.clicked.connect(self.Defaults)
         self.btnUpdate.clicked.connect(self.checkUpdate)
-
+    
     def Apply(self, silent_apply=False):
         exe_path = '\\'.join(__file__.split('\\')[:-1] + ['elmocut.exe'])
 
@@ -113,9 +113,6 @@ class Settings(QMainWindow, Ui_MainWindow):
         s = import_settings()
         self.currentSettings()
         
-        self.elmocut.scanner.__init__()
-        self.elmocut.scanner.init()
-        
         self.elmocut.minimize = s['minimized']
         self.elmocut.remember = s['remember']
         self.elmocut.autoupdate = s['autoupdate']
@@ -127,12 +124,6 @@ class Settings(QMainWindow, Ui_MainWindow):
         
         self.elmocut.setStyleSheet(self.styleSheet())
         self.elmocut.about_window.setStyleSheet(self.styleSheet())
-
-        status_tray = f'Devices Found: {len(self.elmocut.scanner.devices) - 2}\n' \
-                      f'Devices Killed: {len(self.elmocut.killer.killed)}\n' \
-                      f'Interface: {self.elmocut.scanner.iface.name}'
-
-        self.elmocut.tray_icon.setToolTip(status_tray)
 
     def currentSettings(self):
         s = import_settings()

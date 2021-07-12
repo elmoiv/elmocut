@@ -6,7 +6,7 @@ from ui.ui_about import Ui_MainWindow
 
 from tools.utils import goto
 
-from assets import facebook_icon, twitter_icon, linkedin_icon, github_icon, app_icon
+from assets import facebook_icon, twitter_icon, linkedin_icon, github_icon, reddit_icon, app_icon
 
 def clickable(widget):
     class Filter(QObject):
@@ -39,7 +39,8 @@ class About(QMainWindow, Ui_MainWindow):
             (self.lblFacebook, facebook_icon, self.facebook),
             (self.lblTwitter,  twitter_icon,  self.twitter),
             (self.lblLinkedIn, linkedin_icon, self.linkedin),
-            (self.lblGitHub,   github_icon,   self.github)
+            (self.lblGitHub,   github_icon,   self.github),
+            (self.lblReddit,   reddit_icon,   self.reddit)
         ]
 
         for lbl, icon, url in self.social_labels:
@@ -63,4 +64,5 @@ class About(QMainWindow, Ui_MainWindow):
     twitter    = lambda self: goto('https://twitter.com/___xpy___')
     linkedin   = lambda self: goto('https://www.linkedin.com/in/elmoiv/')
     github     = lambda self: goto('https://github.com/elmoiv')
+    reddit     = lambda self: goto('https://www.reddit.com/user/elmoiv')
     github_app = lambda self: goto('https://github.com/elmoiv/elmocut')

@@ -26,7 +26,7 @@ from bridge import ScanThread, UpdateThread
 class ElmoCut(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.version = '1.0.4'
+        self.version = '1.0.5'
         self.icon = self.processIcon(app_icon)
 
         # Add window icon
@@ -453,7 +453,6 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.processDevices()
     
     def UpdateThread_Starter(self):
-        __import__('gc').collect()
         """
         Update Thread starter
         """
