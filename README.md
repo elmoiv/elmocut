@@ -90,6 +90,7 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 ## Features
 - Clean UI.
 - **[Coming Soon]** Switch between available interfaces.
+- **[Coming Soon]** Background live devices discovery.
 - One click to block all devices.
 - Re-kill devices that changed their ip during block.
 - Remember killed devices before exit.
@@ -186,7 +187,7 @@ Now run: `BUILD.bat`
 * [ ] Protect elmoCut user from other spoofers.
 * [x] ***Select between available interfaces.***
 * [ ] Background live connection checker.
-* [ ] Background live devices discovery.
+* [x] ***Background live devices discovery.***
 * [ ] Extend scan for all subnet masks.
 
 ## Contribution
