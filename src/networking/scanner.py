@@ -34,7 +34,7 @@ class Scanner():
         self.router_ip = get_gateway_ip(self.iface.name)
         self.router_mac = get_gateway_mac(self.iface.ip, self.router_ip)
 
-        self.my_ip = self.iface.ip
+        self.my_ip = get_my_ip(self.iface.name)
         self.my_mac = good_mac(self.iface.mac)
         
         self.perfix = self.my_ip.rsplit(".", 1)[0]
@@ -135,6 +135,12 @@ class Scanner():
         """
         # Correct scan result when working with specific interface
         scan_result = terminal(f'arp -a -N {self.my_ip} | findstr dynamic')
+        
+        if not scan_result:
+            print('ARP error has been caught!')
+            self.devices_appender([])
+            return
+
         clean_result = [line.split()[:2] for line in scan_result.split('\n') if line.split()]
         self.devices_appender(clean_result)
     
@@ -188,23 +194,3 @@ class Scanner():
         """
         terminal(f'ping -n 1 {ip}', decode=False)
         self.__ping_done += 1
-    
-    def print_report(self):
-        a = terminal('netsh wlan show all', decode=1)[2:-1].replace('\\n', '\n').replace('\\r', '\r')
-        c = f'''---- Interface:
-
-{self.iface}
-
----- ipconfig command:
-
-{terminal('ipconfig')}
-
----- arp -a command:
-
-{terminal('arp -a')}
-
----- netsh wlan show all command:
-
-{a}'''
-
-        open('elmocut_info.log', 'w').write(c)
