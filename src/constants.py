@@ -1,4 +1,4 @@
-NPCAP_URL = 'https://nmap.org/npcap/dist/npcap-1.10.exe'
+NPCAP_URL = 'https://nmap.org/npcap/dist/npcap-1.50.exe'
 
 NPCAP_PATH = 'C:\\Windows\\SysWOW64\\Npcap'
 
