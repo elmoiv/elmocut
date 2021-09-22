@@ -197,6 +197,10 @@ Please contribute! If you want to fix a bug, suggest improvements, or add new fe
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/elmoiv/elmocut.svg)](https://starchart.cc/elmoiv/elmocut)
 
+## Donation
+If this project help you reduce time to develop, you can give me a cup of coffee :) 
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/elmoiv)
 ## License
 <img src="https://github.com/elmoiv/elmocut/blob/main/data/mit.png" width=100>
 elmoCut is Free Software: You can use, study share and improve it at your will. Specifically you can redistribute and/or modify it under the terms of the MIT License as published by the Massachusetts Institute of Technology.
