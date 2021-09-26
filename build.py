@@ -130,7 +130,7 @@ excluded_modules = ['tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'PIL
 is_gui = not bool(input('Press Enter for GUI, or anything for Console: '))
 app_name = 'elmoCut'
 app_guid = '31430AA0-C0A7-4598-991B-E3B2CD961817'
-version = '1.0.4'
+version = '1.0.5'
 
 import os, shutil, time, re
 
