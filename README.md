@@ -198,7 +198,7 @@ Please contribute! If you want to fix a bug, suggest improvements, or add new fe
 [![Stargazers over time](https://starchart.cc/elmoiv/elmocut.svg)](https://starchart.cc/elmoiv/elmocut)
 
 ## Donation
-If this project help you reduce time to develop, you can give me a cup of coffee :) 
+If you find this project helpful, you can give me a cup of coffee :) 
 
 [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/elmoiv)
 ## License
