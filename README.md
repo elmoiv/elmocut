@@ -38,8 +38,8 @@
   <a href="#download">Download</a> &bull;
   <a href="#requirements">Requirements</a> &bull;
   <a href="#manual">Manual</a> &bull;
-  <a href="#run">Run</a> &bull;
-  <a href="#build">Build</a> &bull;
+  <a href="#run-from-source">Run From Source</a> &bull;
+  <a href="#build-from-source">Build From Source</a> &bull;
   <a href="#todo">TODO</a> &bull;
   <a href="#contribution">Contribution</a> &bull;
   <a href="#license">License</a>
@@ -170,12 +170,12 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
   </tr>
 </table>
  
-## Run
+## Run From Source
  - Install requirements via pip: `pip install -r requirements.txt`
  - Ensure that `pyuic5` is in PATH
  - Click on `RUN.bat`
 
-## Build
+## Build From Source
  - **Required**:
     - PyInstaller: `pip install pyinstaller`
     - MinGW-w64 gcc compiler: [Download](https://netix.dl.sourceforge.net/project/mingw-w64/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe)
