@@ -1,13 +1,10 @@
-from os import path, makedirs, environ
+from os import path, makedirs
 from json import dump, load, JSONDecodeError
 import ctypes
 import winreg
 
 from tools.utils import terminal
 from constants import *
-
-docs = path.join(environ['USERPROFILE'], 'Documents', 'elmocut')
-json_path = path.join(docs, 'elmocut.json')
 
 def is_admin():
     """
@@ -32,8 +29,8 @@ def check_documents_dir():
     """
     Check if documents folder exists in order to store settings
     """
-    makedirs(docs, exist_ok=True)
-    if not path.exists(json_path):
+    makedirs(DOCUMENTS_PATH, exist_ok=True)
+    if not path.exists(SETTINGS_PATH):
         export_settings()
 
 def import_settings():
@@ -41,7 +38,7 @@ def import_settings():
     Get stored settings
     """
     check_documents_dir()
-    return load(open(json_path))
+    return load(open(SETTINGS_PATH))
 
 def export_settings(values=None):
     """
@@ -50,7 +47,7 @@ def export_settings(values=None):
     keys = SETTINGS_KEYS
     values = values if values else SETTINGS_VALS
     json = dict(zip(keys, values))
-    dump(json, open(json_path, 'w'))
+    dump(json, open(SETTINGS_PATH, 'w'))
 
 def set_settings(key, value):
     """

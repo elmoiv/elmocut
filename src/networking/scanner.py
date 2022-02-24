@@ -3,6 +3,7 @@ from scapy.all import Ether, arping, conf, get_if_addr
 from time import sleep
 from re import findall
 
+from networking.nicknames import Nicknames
 from tools.utils import *
 from constants import *
 
@@ -59,6 +60,7 @@ class Scanner():
             'mac':      self.my_mac,
             'vendor':   get_vendor(self.my_mac),
             'type':     'Me',
+            'name':     '',
             'admin':    True
         }
         
@@ -73,6 +75,7 @@ class Scanner():
             'mac':      self.router_mac,
             'vendor':   get_vendor(self.router_mac),
             'type':     'Router',
+            'name':     '',
             'admin':    True
         }
 
@@ -82,6 +85,8 @@ class Scanner():
         """
         Append scan results to self.devices
         """
+        nicknames = Nicknames()
+
         self.devices = []
         unique = []
 
@@ -109,6 +114,7 @@ class Scanner():
                     'mac':    mac,
                     'vendor': get_vendor(mac),
                     'type':   'User',
+                    'name':   nicknames.get_name(mac),
                     'admin':  False
                 }
             )

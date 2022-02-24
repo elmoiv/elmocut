@@ -11,11 +11,12 @@ from ui.ui_main import Ui_MainWindow
 
 from gui.settings import Settings
 from gui.about import About
+from gui.device import Device
 
 from networking.scanner import Scanner
 from networking.killer import Killer
 
-from tools.qtools import colored_item, MsgType, Buttons
+from tools.qtools import colored_item, MsgType, Buttons, clickable
 from tools.utils_gui import set_settings, get_settings
 from tools.utils import goto, check_connection, is_connected
 
@@ -23,10 +24,12 @@ from assets import *
 
 from bridge import ScanThread, UpdateThread
 
+from constants import *
+
 class ElmoCut(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.version = '1.0.5'
+        self.version = '1.0.6'
         self.icon = self.processIcon(app_icon)
 
         # Add window icon
@@ -53,9 +56,10 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.update_thread = UpdateThread()
         self.update_thread.thread_finished.connect(self.UpdateThread_Reciever)
         
-        # We send elmocut to the settings window
+        # Initialize other sub-windows
         self.settings_window = Settings(self, self.icon)
         self.about_window = About(self, self.icon)
+        self.device_window = Device(self, self.icon)
 
         # Connect buttons
         self.buttons = [
@@ -74,14 +78,18 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             btn.clicked.connect(btn_func)
             btn.setIcon(self.processIcon(btn_icon))
 
+        clickable(self.lblDonate).connect(self.paypal)
+        self.setImage(self.lblDonate, donate_icon)
+        
         self.pgbar.setVisible(False)
 
         # Table Widget
         self.tableScan.itemClicked.connect(self.deviceClicked)
+        self.tableScan.itemDoubleClicked.connect(self.deviceDoubleClicked)
         self.tableScan.cellClicked.connect(self.cellClicked)
-        self.tableScan.setColumnCount(4)
+        self.tableScan.setColumnCount(len(TABLE_HEADER_LABELS))
         self.tableScan.verticalHeader().setVisible(False)
-        self.tableScan.setHorizontalHeaderLabels(['IP Address', 'MAC Address', 'Vendor', 'Type'])
+        self.tableScan.setHorizontalHeaderLabels(TABLE_HEADER_LABELS)
 
         '''
            System tray icon and it's tray menu
@@ -92,7 +100,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         kill_option = QAction(self.processIcon(kill_icon), '&Kill All', self)
         unkill_option = QAction(self.processIcon(unkill_icon),'&Unkill All', self)
         
-        show_option.triggered.connect(self.show)
+        show_option.triggered.connect(self.trayShowClicked)
         hide_option.triggered.connect(self.hide_all)
         quit_option.triggered.connect(self.quit_all)
         kill_option.triggered.connect(self.killAll)
@@ -127,6 +135,11 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         icon.addPixmap(pix)
         return icon
     
+    def setImage(self, widget, raw_image):
+        pix = QPixmap()
+        pix.loadFromData(raw_image)
+        widget.setPixmap(pix)
+    
     def connected(self):
         """
         Prompt when disconnected
@@ -151,6 +164,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.settings_window.loadInterfaces()
         self.settings_window.currentSettings()
         self.settings_window.show()
+        self.settings_window.setWindowState(Qt.WindowNoState)
 
     def openAbout(self):
         """
@@ -158,6 +172,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         self.about_window.hide()
         self.about_window.show()
+        self.about_window.setWindowState(Qt.WindowNoState)
 
     def applySettings(self):
         """
@@ -165,12 +180,18 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         self.settings_window.updateElmocutSettings()
 
+    def trayShowClicked(self):
+        self.show()
+        # Restore window state if was minimized before hidden
+        self.setWindowState(Qt.WindowNoState)
+        self.activateWindow()
+
     def tray_clicked(self, event):
         """
         Show elmoCut when tray icon is left-clicked
         """
         if event == QSystemTrayIcon.Trigger:
-            self.show()
+            self.trayShowClicked()
 
     def hide_all(self):
         """
@@ -205,8 +226,9 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         Auto resize table widget columns dynamically
         """
-        for i in range(4):
-            self.tableScan.setColumnWidth(i, self.tableScan.width() // 4)
+        label_count = len(TABLE_HEADER_LABELS)
+        for i in range(label_count):
+            self.tableScan.setColumnWidth(i, self.tableScan.width() // label_count)
 
     def closeEvent(self, event):
         """
@@ -255,6 +277,10 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
         # Get cell text using dict.values instead of .itemAt()
         cell = list(device.values())[column]
+        
+        if len(cell) > 20:
+            cell = cell[:20] + '...'
+        
         self.lblcenter.setText(cell)
         copy(cell)
 
@@ -267,6 +293,55 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.btnKill.setEnabled(not_enabled)
         self.btnUnkill.setEnabled(not_enabled)
     
+    def deviceDoubleClicked(self):
+        """
+        Open device info window (when not admin)
+        """
+        device = self.current_index()
+        if device['admin']:
+            self.log('Admin device', color='orange')
+            return
+        
+        self.device_window.load(device, self.tableScan.currentRow())
+        self.device_window.hide()
+        self.device_window.show()
+        self.device_window.setWindowState(Qt.WindowNoState)
+    
+    def fillTableCell(self, row, column, text, colors=[]):
+        # Center text in table cell
+        ql = QTableWidgetItem()
+        ql.setText(text)
+        ql.setTextAlignment(Qt.AlignCenter)
+
+        if colors:
+            colored_item(ql, *colors)
+        
+        # Add cell to the specific location
+        self.tableScan.setItem(row, column, ql)
+
+    def fillTableRow(self, row, device):
+        for column, text in enumerate(device.values()):
+            # Skip 'admin' key
+            if type(text) == bool:
+                continue
+            
+            # Highlight Admins in green
+            if device['admin']:
+                self.fillTableCell(
+                    row,
+                    column,
+                    text,
+                    ['#00ff00', '#000000']
+                )
+            else:
+                self.fillTableCell(
+                    row,
+                    column,
+                    text,
+                    # Highlight killed devices in red else transparent
+                    ['#ff0000', '#ffffff'] * (device['mac'] in self.killer.killed)
+                )
+
     def showDevices(self):
         """
         View scanlist devices with correct colors processed
@@ -276,24 +351,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.tableScan.setRowCount(len(self.scanner.devices))
 
         for row, device in enumerate(self.scanner.devices):
-            for column, item in enumerate(device.values()):
-                # Skip 'admin' key
-                if type(item) == bool:
-                    continue
-                
-                # Center text in eah cell
-                ql = QTableWidgetItem()
-                ql.setText(item)
-                ql.setTextAlignment(Qt.AlignCenter)
-                
-                # Highlight Admins and killed devices
-                if device['admin']:
-                    colored_item(ql, '#00ff00', '#000000')
-                if device['mac'] in self.killer.killed:
-                    colored_item(ql, '#ff0000', '#ffffff')
-                
-                # Add cell to the row
-                self.tableScan.setItem(row, column, ql)
+            self.fillTableRow(row, device)
         
         status = f'{len(self.scanner.devices) - 2} devices' \
                  f' ({len(self.killer.killed)} killed)'
@@ -329,7 +387,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.killer.release()
 
         self.log(
-            f'Found {len(self.scanner.devices) - 1} devices.',
+            f'Found {len(self.scanner.devices) - 2} devices.',
             'orange'
         )
 
@@ -341,13 +399,13 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         Apply ARP spoofing to selected device
         """
         if not self.tableScan.selectedItems():
-            self.log('No device selected.', 'red')
+            self.log('No device selected', 'red')
             return
 
         device = self.current_index()
         
         if device['mac'] in self.killer.killed:
-            self.log('Device is already killed.', 'red')
+            self.log('Device is already killed', 'red')
             return
         
         # Killing process
@@ -363,13 +421,13 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         Disable ARP spoofing on previously spoofed devices
         """
         if not self.tableScan.selectedItems():
-            self.log('No device selected.', 'red')
+            self.log('No device selected', 'red')
             return
 
         device = self.current_index()
             
         if device['mac'] not in self.killer.killed:
-            self.log('Device is already unkilled.', 'red')
+            self.log('Device is already unkilled', 'red')
             return
         
         # Unkilling process
@@ -386,7 +444,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         self.killer.kill_all(self.scanner.devices)
         set_settings('killed', list(self.killer.killed) * self.remember)
-        self.log('Killed All devices.', 'fuchsia')
+        self.log('Killed All devices', 'fuchsia')
 
         self.showDevices()
 
@@ -397,7 +455,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         self.killer.unkill_all()
         set_settings('killed', list(self.killer.killed) * self.remember)
-        self.log('Unkilled All devices.', 'lime')
+        self.log('Unkilled All devices', 'lime')
 
         self.showDevices()
 
@@ -486,3 +544,6 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
                 'Check for update',
                 'You have the latest version installed.'
             )
+    
+    # Open Paypal page
+    paypal = lambda self: goto('https://www.paypal.me/elmoiv')

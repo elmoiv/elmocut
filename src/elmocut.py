@@ -34,4 +34,7 @@ if __name__ == "__main__":
         GUI.scanner.flush_arp()
         GUI.scanEasy()
         GUI.UpdateThread_Starter()
+        # Bring window to top on startup
+        GUI.activateWindow()
+        #GUI.scanner.print_report()
         exit(app.exec_())

@@ -130,7 +130,10 @@ excluded_modules = ['tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'PIL
 is_gui = not bool(input('Press Enter for GUI, or anything for Console: '))
 app_name = 'elmoCut'
 app_guid = '31430AA0-C0A7-4598-991B-E3B2CD961817'
-version = '1.0.5'
+version = input('Enter version: ')
+
+try:sum(map(int, version.split('.')))
+except:version='1.0.0'
 
 import os, shutil, time, re
 
@@ -184,6 +187,9 @@ app_path = f'output\\{app_name}\\'
 
 platforms_dlls = app_path + 'PyQt5\\Qt\\plugins\\platforms\\'
 
+## Kill elmocut in case was running from old output folder
+os.system('taskkill /f /im elmoCut.exe')
+
 ## Remove previous builds
 if os.path.exists(app_path):
     shutil.rmtree(app_path)
@@ -215,7 +221,11 @@ for rm in [
   'build', 
   app_path + 'PyQt5\\Qt\\translations',
   app_path + 'PyQt5\\Qt\\plugins\\imageformats',
-  app_path + 'PyQt5\\Qt\\plugins\\iconengines']:
+  app_path + 'PyQt5\\Qt\\plugins\\iconengines',
+  app_path + 'altgraph-0.17.dist-info',
+  app_path + 'pyinstaller-4.9.dist-info',
+  app_path + 'setuptools-41.2.0.dist-info'
+  ]:
     shutil.rmtree(rm)
 
 # Dynamically add files list to iss file

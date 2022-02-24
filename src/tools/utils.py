@@ -43,6 +43,14 @@ def good_mac(mac):
     """
     return mac.upper().replace('-', ':')
 
+def get_my_ip(iface_name):
+    """
+    Get Gateway IP if connected else None
+    """
+    response = terminal('netsh interface ip show address '
+                      f'"{iface_name}" | findstr "IP"')
+    return response.split()[-1] if response else '127.0.0.1'
+
 def get_gateway_ip(iface_name):
     """
     Get Gateway IP if connected else None
@@ -52,7 +60,7 @@ def get_gateway_ip(iface_name):
     return response.split()[-1] if response else '0.0.0.0'
 
 def get_gateway_mac(iface_ip, router_ip):
-    response = terminal(f'arp -a {router_ip} -N {iface_ip} | findstr dynamic')
+    response = terminal(f'arp -a {router_ip} -N {iface_ip} | findstr "dynamic static"')
     try:
         return good_mac(response.split()[1])
     except:

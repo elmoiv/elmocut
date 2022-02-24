@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 from qdarkstyle import load_stylesheet
+import os
 
 from tools.utils_gui import import_settings, export_settings, get_settings, \
                       is_admin, add_to_startup, remove_from_startup, set_settings
@@ -10,6 +11,9 @@ from tools.utils import goto, get_ifaces, get_default_iface, get_iface_by_name, 
 
 from ui.ui_settings import Ui_MainWindow
 
+from networking.nicknames import Nicknames
+
+from constants import *
 
 class Settings(QMainWindow, Ui_MainWindow):
     def __init__(self, elmocut, icon):
@@ -36,7 +40,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.btnUpdate.clicked.connect(self.checkUpdate)
     
     def Apply(self, silent_apply=False):
-        exe_path = '\\'.join(__file__.split('\\')[:-1] + ['elmocut.exe'])
+        nicknames = Nicknames()
 
         count         =  self.spinCount.value()
         threads       =  self.spinThreads.value()
@@ -46,7 +50,8 @@ class Settings(QMainWindow, Ui_MainWindow):
         is_remember   =  self.chkRemember.isChecked()
         is_autoupdate =  self.chkAutoupdate.isChecked()
         iface         =  self.comboInterface.currentText()
-       
+
+        exe_path = os.path.join(os.getcwd(), 'elmocut.exe')
         if is_autostart:
             add_to_startup(exe_path)
         else:
@@ -68,7 +73,8 @@ class Settings(QMainWindow, Ui_MainWindow):
             killed_all,
             is_autoupdate,
             threads,
-            iface
+            iface,
+            nicknames.nicknames_database
             ]
         )
 
@@ -77,7 +83,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.elmocut.iface = get_iface_by_name(iface)
         self.updateElmocutSettings()
         # Fix horizontal headerfont reverts to normal after applying settings
-        self.elmocut.tableScan.horizontalHeader().setFont(QFont('Courier', 11))
+        self.elmocut.tableScan.horizontalHeader().setFont(QFont('Consolas', 11))
 
         if not silent_apply:
             MsgType.INFO(
@@ -96,6 +102,8 @@ class Settings(QMainWindow, Ui_MainWindow):
             # Restart elmoCut via restart.exe
             __import__('os').system('start "" restart.exe')
             self.elmocut.quit_all()
+        
+        self.close()
 
     def Defaults(self):
         if MsgType.WARN(
@@ -105,7 +113,23 @@ class Settings(QMainWindow, Ui_MainWindow):
             Buttons.YES | Buttons.NO
         ) == Buttons.NO:
             return
-        export_settings()
+        
+        nickname_prompt = MsgType.WARN(
+            self,
+            'Default settings',
+            'Do you want to reset devices nicknames?',
+            Buttons.YES | Buttons.NO
+        )
+        
+        # Check if user wants to keep nicknames or not
+        if nickname_prompt == Buttons.NO:
+            nicknames = Nicknames()
+            vals = SETTINGS_VALS[:]
+            vals[-1] = nicknames.nicknames_database
+            export_settings(vals)
+        else:
+            export_settings()
+        
         self.currentSettings()
         self.Apply()
 

@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QMessageBox as QMsg
+from PyQt5.QtCore import pyqtSignal, QEvent, QObject
 
 class Buttons:
     CANCEL = QMsg.Cancel
@@ -35,3 +36,18 @@ def msg_box(title, text, window_icon, icon, buttons=Buttons.OK):
     msg.setIcon(window_icon)
     msg.setStandardButtons(buttons)
     return msg.exec_()
+
+def clickable(widget):
+    class Filter(QObject):
+        clicked = pyqtSignal()
+        def eventFilter(self, obj, event):
+            if obj == widget and \
+               event.type() == QEvent.MouseButtonRelease and \
+               obj.rect().contains(event.pos()):
+                    self.clicked.emit()
+                    return True
+            return False
+    
+    _filter = Filter(widget)
+    widget.installEventFilter(_filter)
+    return _filter.clicked
