@@ -3,7 +3,7 @@ from os import path, environ
 DOCUMENTS_PATH = path.join(environ['USERPROFILE'], 'Documents', 'elmocut')
 SETTINGS_PATH = path.join(DOCUMENTS_PATH, 'elmocut.json')
 
-TABLE_HEADER_LABELS = ['IP Address', 'MAC Address', 'Vendor', 'Type', 'Nickname']
+TABLE_HEADER_LABELS = ['IP Address', 'MAC Address', 'Vendor', 'Type', 'Hostname', 'Nickname']
 
 NPCAP_URL = 'https://nmap.org/npcap/dist/npcap-1.50.exe'
 
@@ -17,7 +17,8 @@ DUMMY_ROUTER = {
     'vendor': 'NONE',
     'type': 'Router',
     'name': '-',
-    'admin': True
+    'admin': True,
+    'hostname': 'PC-123'
 }
 
 DUMMY_IFACE = {'name': 'NULL', 'mac': GLOBAL_MAC, 'guid': 'NULL', 'ips': ['0.0.0.0']}
