@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'Y:\Development\elmocut\exe\ui_settings.ui'
+# Form implementation generated from reading ui file 'C:\Users\kelmo\Desktop\OLD DESKTOP\-Python\CODE\elmocut\exe\ui_about.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
