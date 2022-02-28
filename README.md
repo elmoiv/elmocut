@@ -117,9 +117,9 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 
 
 ## Requirements
-  - Npcap: [Download](https://nmap.org/npcap/dist/npcap-1.10.exe)
   - x64 Microsoft Windows >= 7
   - .NET Framework 3+
+  - Npcap: [Download](https://nmap.org/npcap/dist/npcap-1.10.exe)
 
 ## Manual
 <table>
