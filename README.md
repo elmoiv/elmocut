@@ -206,16 +206,18 @@ Now run: `BUILD.bat`
 * [ ] Background live devices discovery.
 * [ ] Extend scan for all subnet masks.
 
+## Donation
+If you find this project helpful, you can give me a cup of coffee :) 
+
+<a href="https://www.buymeacoffee.com/elmoiv" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>&nbsp;&nbsp;<a href="https://www.paypal.me/elmoiv" target="_blank"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate via PayPal" height="41" width="174"></a>
+
 ## Contribution
 Please contribute! If you want to fix a bug, suggest improvements, or add new features to the project, just [open an issue](https://github.com/elmoiv/elmocut/issues) or send me a pull request.
 
 ## Stargazers over time
 [![Stargazers over time](https://starchart.cc/elmoiv/elmocut.svg)](https://starchart.cc/elmoiv/elmocut)
 
-## Donation
-If you find this project helpful, you can give me a cup of coffee :) 
 
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/elmoiv)
 ## License
 [![GNU GPLv3 Image](https://www.gnu.org/graphics/gplv3-127x51.png)](https://www.gnu.org/licenses/gpl-3.0.en.html)  
 elmoCut is Free Software: You can use, study share and improve it at your will. Specifically you can redistribute and/or modify it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl.html) as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
