@@ -199,6 +199,7 @@ Now run: `BUILD.bat`
 
 
 ## TODO
+* [ ] Work properly on any Windows language.
 * [ ] Control download and upload limit of connected devices.
 * [ ] Protect elmoCut user from other spoofers.
 * [x] ***Select between available interfaces.***
