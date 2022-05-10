@@ -112,7 +112,7 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 - Run minimized in the background.
 
 ## Limitations
-- *Works only for Windows with English language (Temporary)*
+- ***Works only for Windows with English language (Temporary)***
 - Can only search for 255 devices (255.255.255.0 subnet masks)
 - Both scan types are manual.
 
