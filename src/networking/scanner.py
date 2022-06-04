@@ -60,11 +60,10 @@ class Scanner():
             'mac':      self.my_mac,
             'vendor':   get_vendor(self.my_mac),
             'type':     'Me',
-            'hostname': get_hostname(self.my_ip),
             'name':     '',
-            'admin':    True,
+            'admin':    True
         }
-
+        
         self.devices.insert(0, self.me)
 
     def add_router(self):
@@ -76,9 +75,8 @@ class Scanner():
             'mac':      self.router_mac,
             'vendor':   get_vendor(self.router_mac),
             'type':     'Router',
-            'hostname': get_hostname(self.router_ip),
             'name':     '',
-            'admin':    True,
+            'admin':    True
         }
 
         self.devices.insert(0, self.router)
@@ -116,7 +114,6 @@ class Scanner():
                     'mac':    mac,
                     'vendor': get_vendor(mac),
                     'type':   'User',
-                    'hostname': get_hostname(ip),
                     'name':   nicknames.get_name(mac),
                     'admin':  False
                 }

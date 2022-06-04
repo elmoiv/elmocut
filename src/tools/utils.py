@@ -7,8 +7,6 @@ from manuf import manuf
 from networking.ifaces import NetFace
 from constants import *
 
-import socket
-
 p = manuf.MacParser()
 
 def terminal(command, shell=True, decode=True):
@@ -67,14 +65,6 @@ def get_gateway_mac(iface_ip, router_ip):
         return good_mac(response.split()[1])
     except:
         return GLOBAL_MAC
-
-def get_hostname(ip):
-    try:
-        hostname = socket.gethostbyaddr(ip)[0]
-    except:
-        hostname = "-"
-
-    return hostname
 
 def goto(url):
     """
