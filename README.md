@@ -129,6 +129,7 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 ## Requirements
   - x64 Microsoft Windows >= 7
   - .NET Framework 3+
+  - Visual C++ Redistributable Runtimes: [Download](https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/)
   - Npcap: [Download](https://nmap.org/npcap/dist/npcap-1.10.exe)
 
 ## Manual
