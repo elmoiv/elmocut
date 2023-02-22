@@ -61,7 +61,7 @@ exe = EXE(pyz,
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
-          upx=True,
+          upx=False,
           console={4} , version='tmp.txt', icon='{0}exe\\\\icon.ico')
 
 coll = COLLECT(exe,
@@ -69,7 +69,7 @@ coll = COLLECT(exe,
                a.zipfiles,
                a.datas,
                strip=False,
-               upx=True,
+               upx=False,
                upx_exclude={2},
                name='{5}')'''
 
@@ -133,12 +133,13 @@ app_guid = '31430AA0-C0A7-4598-991B-E3B2CD961817'
 version = input('Enter version: ')
 
 try:sum(map(int, version.split('.')))
-except:version='1.0.0'
+except:version='1.0.7'
 
 import os, shutil, time, re
 
 # Auto update version in main.py
 src_main = open('src\\gui\\main.py').read()
+open('src\\gui\\main.py_backup', 'w').write(src_main)
 new_main = re.sub(
               r"self.version = '(\d+\.\d+\.\d+)'",
               f"self.version = '{version}'", 
@@ -205,9 +206,9 @@ os.system(f'gcc src\\tools\\restart.c -o {app_path}restart.exe')
 os.makedirs(app_path + 'manuf', exist_ok=True)
 shutil.copy('exe\\manuf', app_path + 'manuf\\manuf')
 
-# UPX with Executable and restart.exe
-os.system(f'upx {app_path}{app_name}.exe')
-os.system(f'upx {app_path}restart.exe')
+# # UPX with Executable and restart.exe
+# os.system(f'upx {app_path}{app_name}.exe')
+# os.system(f'upx {app_path}restart.exe')
 
 print('>>> Removing unnecessary files')
 ## Remove all platforms dll but qwindows.dll

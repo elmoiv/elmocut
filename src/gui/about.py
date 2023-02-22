@@ -1,13 +1,11 @@
 from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtCore import pyqtSignal, QEvent, QObject
+# from PyQt5.QtCore import pyqtSignal, QEvent, QObject
 from PyQt5.QtGui import QPixmap
 
 from ui.ui_about import Ui_MainWindow
-
 from tools.qtools import clickable
 from tools.utils import goto
-
-from assets import facebook_icon, twitter_icon, linkedin_icon, github_icon, reddit_icon, app_icon
+from assets import twitter_icon, linkedin_icon, github_icon, reddit_icon, app_icon
 
 class About(QMainWindow, Ui_MainWindow):
     def __init__(self, elmocut, icon):

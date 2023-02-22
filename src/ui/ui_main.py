@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+# Form implementation generated from reading ui file 'C:\Users\ELMOIV\Desktop\Python Data\elmocut\exe\ui_main.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #
@@ -32,7 +33,7 @@ class Ui_MainWindow(object):
         font.setPointSize(9)
         self.lblcenter.setFont(font)
         self.lblcenter.setText("")
-        self.lblcenter.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.lblcenter.setAlignment(QtCore.Qt.AlignCenter)
         self.lblcenter.setObjectName("lblcenter")
         self.gridLayout.addWidget(self.lblcenter, 3, 3, 1, 2)
         self.btnSettings = QtWidgets.QPushButton(self.centralwidget)

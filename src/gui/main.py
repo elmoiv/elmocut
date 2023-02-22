@@ -18,7 +18,7 @@ from networking.killer import Killer
 
 from tools.qtools import colored_item, MsgType, Buttons, clickable
 from tools.utils_gui import set_settings, get_settings
-from tools.utils import goto, check_connection, is_connected
+from tools.utils import goto, is_connected
 
 from assets import *
 
@@ -26,15 +26,19 @@ from bridge import ScanThread, UpdateThread
 
 from constants import *
 
+# from qt_material import build_stylesheet
+
 class ElmoCut(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.version = '1.0.6'
+        self.version = '1.0.7'
         self.icon = self.processIcon(app_icon)
 
         # Add window icon
         self.setWindowIcon(self.icon)
         self.setupUi(self)
+        # stylesheet = build_stylesheet('dark_teal.xml', 0, {}, 'theme')
+        # self.setStyleSheet(stylesheet)
         self.setStyleSheet(load_stylesheet())
         
         # Main Props
@@ -78,7 +82,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             btn.clicked.connect(btn_func)
             btn.setIcon(self.processIcon(btn_icon))
 
-        clickable(self.lblDonate).connect(self.paypal)
+        clickable(self.lblDonate).connect(self.buymeacoffee)
         self.setImage(self.lblDonate, donate_icon)
         
         self.pgbar.setVisible(False)
@@ -140,14 +144,15 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         pix.loadFromData(raw_image)
         widget.setPixmap(pix)
     
-    def connected(self):
+    def connected(self, show_msg_box=False):
         """
         Prompt when disconnected
         """
         if is_connected(current_iface=self.scanner.iface):
             return True
         self.log('Connection lost!', 'red')
-        QMessageBox.critical(self, 'elmoCut', 'Connection Lost!')
+        if show_msg_box:
+            QMessageBox.critical(self, 'elmoCut', 'Connection Lost!')
         return False
 
     def log(self, text, color='white'):
@@ -393,11 +398,14 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
         self.showDevices()
 
-    @check_connection
+    # @check_connection
     def kill(self):
         """
         Apply ARP spoofing to selected device
         """
+        if not self.connected():
+            return
+        
         if not self.tableScan.selectedItems():
             self.log('No device selected', 'red')
             return
@@ -415,11 +423,14 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         
         self.showDevices()
     
-    @check_connection
+    # @check_connection
     def unkill(self):
         """
         Disable ARP spoofing on previously spoofed devices
         """
+        if not self.connected():
+            return
+        
         if not self.tableScan.selectedItems():
             self.log('No device selected', 'red')
             return
@@ -437,22 +448,28 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
         self.showDevices()
     
-    @check_connection
+    # @check_connection
     def killAll(self):
         """
         Kill all scanned devices except admins
         """
+        if not self.connected():
+            return
+        
         self.killer.kill_all(self.scanner.devices)
         set_settings('killed', list(self.killer.killed) * self.remember)
         self.log('Killed All devices', 'fuchsia')
 
         self.showDevices()
 
-    @check_connection
+    # @check_connection
     def unkillAll(self):
         """
         Unkill all killed devices except admins
         """
+        if not self.connected():
+            return
+        
         self.killer.unkill_all()
         set_settings('killed', list(self.killer.killed) * self.remember)
         self.log('Unkilled All devices', 'lime')
@@ -476,7 +493,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         Scan Thread Starter
         """
-        if not self.connected():
+        if not self.connected(show_msg_box=True):
             return
 
         self.centralwidget.setEnabled(False)
@@ -545,5 +562,5 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
                 'You have the latest version installed.'
             )
     
-    # Open Paypal page
-    paypal = lambda self: goto('https://www.paypal.me/elmoiv')
+    # Open BuyMeACoffee page
+    buymeacoffee = lambda self: goto('https://www.buymeacoffee.com/elmoiv')

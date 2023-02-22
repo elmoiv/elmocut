@@ -1,10 +1,12 @@
-from os import path, makedirs
+from os import path, makedirs, rename
 from json import dump, load, JSONDecodeError
 import ctypes
 import winreg
 
 from tools.utils import terminal
 from constants import *
+
+
 
 def is_admin():
     """
@@ -77,6 +79,17 @@ def repair_settings():
         pass
         
     export_settings(list(original.values()))
+
+def migrate_settings_file():
+    old_exists = path.exists(OLD_SETTINGS_PATH)
+    new_exists = path.exists(SETTINGS_PATH)
+    if old_exists and not new_exists:
+        try:
+            makedirs(DOCUMENTS_PATH, exist_ok=True)
+            rename(OLD_SETTINGS_PATH, SETTINGS_PATH)
+        except Exception as e:
+            print(f'Migrating settings error: {e}')
+            print('New settings file created instead.')
 
 def add_to_startup(exe_path):
     """

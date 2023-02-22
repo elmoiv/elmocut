@@ -1,6 +1,3 @@
-# Ignore Patched exe
-data/elmocut.exe
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -130,3 +127,17 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Custom folders
+/screenshots/
+/src/debug/
+/output/
+/data/
+/Data-/
+
+# Custom files
+Community Stuff.txt
+new features.txt
+TODO.txt
+/src/gui/main.py_backup
+/src/tools/restart.exe

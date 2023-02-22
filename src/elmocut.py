@@ -2,13 +2,15 @@ from sys import argv, exit
 from PyQt5.QtWidgets import QApplication
 
 from tools.utils import goto
-from tools.utils_gui import npcap_exists, duplicate_elmocut, repair_settings
+from tools.utils_gui import npcap_exists, duplicate_elmocut, repair_settings, migrate_settings_file
 from tools.qtools import msg_box, Buttons, MsgIcon
 
 from gui.main import ElmoCut
 
 from assets import app_icon
 from constants import *
+
+# import debug.test
 
 if __name__ == "__main__":
     app = QApplication(argv)
@@ -26,6 +28,7 @@ if __name__ == "__main__":
     
     # Run the GUI
     else:
+        migrate_settings_file()
         repair_settings()
         GUI = ElmoCut()
         GUI.show()

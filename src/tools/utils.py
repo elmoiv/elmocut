@@ -1,6 +1,6 @@
 from scapy.all import conf, get_if_list, get_windows_if_list, get_if_hwaddr
 from subprocess import check_output, CalledProcessError
-from socket import socket, getfqdn, gethostbyname
+from socket import socket
 from threading import Thread
 from manuf import manuf
 
@@ -114,6 +114,7 @@ def is_connected(current_iface=get_default_iface()):
     """
     Checks if there are any IPs in Default Gateway sections
     """
+    # print(current_iface)
     if current_iface.name == 'NULL':
         return False
 
