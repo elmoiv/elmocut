@@ -1,6 +1,6 @@
 from os import path, environ
 
-DOCUMENTS_PATH = path.join(environ['USERPROFILE'], 'Documents', 'elmocut')
+DOCUMENTS_PATH = path.join(environ['APPDATA'], 'elmocut')
 SETTINGS_PATH = path.join(DOCUMENTS_PATH, 'elmocut.json')
 
 TABLE_HEADER_LABELS = ['IP Address', 'MAC Address', 'Vendor', 'Type', 'Nickname']
