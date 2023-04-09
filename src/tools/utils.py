@@ -143,11 +143,9 @@ def is_connected(current_iface=get_default_iface()):
     if current_iface.name == 'NULL':
         return False
 
-    words = ['gateway', 'puerta']
-    for word in words:
-        ipconfig_output = terminal(f'ipconfig | findstr /i {word}')
-        if ipconfig_output is not None:
-            return any(i.isdigit() for i in ipconfig_output)
+    ipconfig_output = get_gateway_ip()
+    if ipconfig_output != '0.0.0.0':
+        return ipconfig_output
 
     # Alternative way if ipconfig has error in some systems
     # Slower than ipconfig workaround
