@@ -4,7 +4,7 @@ from socket import socket
 from threading import Thread
 from manuf import manuf
 
-from networking.ifaces import NetFace
+from models.ifaces import NetFace
 from constants import *
 
 p = manuf.MacParser()
@@ -89,7 +89,7 @@ def get_ifaces():
     conf.route.resync()
     pcap = [net.split('_')[-1] for net in get_if_list()]
     for iface in get_windows_if_list():
-        if iface['guid'] in pcap: 
+        if iface['guid'] in pcap and iface['ips'] != []:
             yield NetFace(iface)
 
 def get_default_iface():

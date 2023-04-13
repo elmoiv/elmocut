@@ -11,7 +11,7 @@ from ui.ui_main import Ui_MainWindow
 
 from gui.settings import Settings
 from gui.about import About
-from gui.device import Device
+from gui.device import DeviceWindow
 
 from networking.scanner import Scanner
 from networking.killer import Killer
@@ -31,7 +31,6 @@ from constants import *
 class ElmoCut(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        self.version = '1.0.7'
         self.icon = self.processIcon(app_icon)
 
         # Add window icon
@@ -63,7 +62,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         # Initialize other sub-windows
         self.settings_window = Settings(self, self.icon)
         self.about_window = About(self, self.icon)
-        self.device_window = Device(self, self.icon)
+        self.device_window = DeviceWindow(self, self.icon)
 
         # Connect buttons
         self.buttons = [
@@ -281,7 +280,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         device = self.current_index()
 
         # Get cell text using dict.values instead of .itemAt()
-        cell = list(device.values())[column]
+        cell = list(device.to_dict().values())[column]
         
         if len(cell) > 20:
             cell = cell[:20] + '...'
@@ -293,7 +292,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         Disable kill, unkill buttons when admins are selected
         """
-        not_enabled = not self.current_index()['admin']
+        not_enabled = not self.current_index().admin
         
         self.btnKill.setEnabled(not_enabled)
         self.btnUnkill.setEnabled(not_enabled)
@@ -303,7 +302,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         Open device info window (when not admin)
         """
         device = self.current_index()
-        if device['admin']:
+        if device.admin:
             self.log('Admin device', color='orange')
             return
         
@@ -324,28 +323,18 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         # Add cell to the specific location
         self.tableScan.setItem(row, column, ql)
 
-    def fillTableRow(self, row, device):
-        for column, text in enumerate(device.values()):
-            # Skip 'admin' key
-            if type(text) == bool:
-                continue
-            
-            # Highlight Admins in green
-            if device['admin']:
-                self.fillTableCell(
-                    row,
-                    column,
-                    text,
-                    ['#00ff00', '#000000']
-                )
-            else:
-                self.fillTableCell(
-                    row,
-                    column,
-                    text,
-                    # Highlight killed devices in red else transparent
-                    ['#ff0000', '#ffffff'] * (device['mac'] in self.killer.killed)
-                )
+    def fillTableRow(self, row, device: Device):
+        colors = []
+        if device.admin:
+            colors = ['#00ff00', '#000000']
+        else:
+            colors = ['#ff0000', '#ffffff'] * (device.mac in self.killer.killed)
+        
+        props = device.to_dict()
+        del props['admin']
+
+        for column, prop in enumerate(props.values()):
+            self.fillTableCell(row, column, prop, colors)
 
     def showDevices(self):
         """
@@ -385,7 +374,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         
         # re-kill saved devices after exit
         for rem_device in self.scanner.devices:
-            if rem_device['mac'] in get_settings('killed') * self.remember:
+            if rem_device.mac in get_settings('killed') * self.remember:
                 self.killer.kill(rem_device)
 
         # clear old database
@@ -412,14 +401,14 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
         device = self.current_index()
         
-        if device['mac'] in self.killer.killed:
+        if device.mac in self.killer.killed:
             self.log('Device is already killed', 'red')
             return
         
         # Killing process
         self.killer.kill(device)
         set_settings('killed', list(self.killer.killed) * self.remember)
-        self.log('Killed ' + device['ip'], 'fuchsia')
+        self.log('Killed ' + device.ip, 'fuchsia')
         
         self.showDevices()
     
@@ -437,14 +426,14 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
 
         device = self.current_index()
             
-        if device['mac'] not in self.killer.killed:
+        if device.mac not in self.killer.killed:
             self.log('Device is already unkilled', 'red')
             return
         
         # Unkilling process
         self.killer.unkill(device)
         set_settings('killed', list(self.killer.killed) * self.remember)
-        self.log('Unkilled ' + device['ip'], 'lime')
+        self.log('Unkilled ' + device.ip, 'lime')
 
         self.showDevices()
     
@@ -545,7 +534,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         if new_version == 'None':
             return
         
-        if new_version != self.version:
+        if new_version != VERSION:
             if MsgType.INFO(
                 self,
                 'elmoCut Update Available',
@@ -555,7 +544,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             ) == Buttons.YES:
                 goto(update_url)
         
-        if new_version == self.version and self.update_thread.prompt_if_latest:
+        if new_version == VERSION and self.update_thread.prompt_if_latest:
             MsgType.INFO(
                 self.settings_window, # Run this within settings window
                 'Check for update',

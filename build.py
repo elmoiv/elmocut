@@ -125,27 +125,32 @@ excluded_binaries = ['api-ms-win-core-console-l1-1-0.dll', 'api-ms-win-core-date
 
 excluded_upx = ['qwindows.dll', 'qsvgicon.dll', 'qxdgdesktopportal.dll', 'qwindowsvistastyle.dll']
 
-excluded_modules = ['tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'PIL', 'tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'matplotlib', 'IPython', 'scipy', 'eel', 'jedi', 'win32com', 'numpy', 'wcwidth', 'win32wnet', '_asyncio', '_bz2', '_decimal', '_hashlib', '_lzma', '_multiprocessing', '_overlapped', '_win32sysloader', '_cffi_backend', '_openssl', 'cryptography']
+excluded_modules = ['tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'PIL', 'tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'matplotlib', 'IPython', 'scipy', 'eel', 'jedi', 'win32com', 'numpy', 'wcwidth', 'win32wnet', '_asyncio', '_bz2', '_decimal', '_hashlib', '_lzma', '_multiprocessing', '_overlapped', '_win32sysloader', '_cffi_backend', '_openssl', 'cryptography', 'docutils']
 
 is_gui = not bool(input('Press Enter for GUI, or anything for Console: '))
 app_name = 'elmoCut'
 app_guid = '31430AA0-C0A7-4598-991B-E3B2CD961817'
 version = input('Enter version: ')
 
-try:sum(map(int, version.split('.')))
-except:version='1.0.7'
+try:
+    sum(map(int, version.split('.')))
+except:
+    print('Wrong version format!')
+    exit(0)
 
 import os, shutil, time, re
 
+constants_path = 'src\\constants.py'
+
 # Auto update version in main.py
-src_main = open('src\\gui\\main.py').read()
-open('src\\gui\\main.py_backup', 'w').write(src_main)
+src_main = open(constants_path).read()
+open(constants_path + '_backup', 'w').write(src_main)
 new_main = re.sub(
-              r"self.version = '(\d+\.\d+\.\d+)'",
-              f"self.version = '{version}'", 
+              r"VERSION = '(\d+\.\d+\.\d+)'",
+              f"VERSION = '{version}'", 
               src_main
           )
-open('src\\gui\\main.py', 'w').write(new_main)
+open(constants_path, 'w').write(new_main)
 
 def version_format(s):
     # Convert xx.xx.xx.xx -> (xx, xx, xx, xx)
@@ -182,11 +187,12 @@ open('tmp.spec', 'w').write(sepc_file)
 start = time.time()
 
 print('>>> [PyInstaller] Converting project to exe')
-os.system('pyinstaller tmp.spec --log-level "ERROR" --noconfirm')
+os.system('pyinstaller tmp.spec --noconfirm')
 
 app_path = f'output\\{app_name}\\'
 
 platforms_dlls = app_path + 'PyQt5\\Qt\\plugins\\platforms\\'
+bin_dlls = app_path + 'PyQt5\\Qt\\bin\\'
 
 ## Kill elmocut in case was running from old output folder
 os.system('taskkill /f /im elmoCut.exe')
@@ -216,6 +222,11 @@ for dll in os.listdir(platforms_dlls):
     if not 'qwindows.dll' in dll:
         os.remove(platforms_dlls + dll)
 
+## Remove unneeded QT bin dlls
+for dll in os.listdir(bin_dlls):
+    if dll in excluded_binaries:
+        os.remove(bin_dlls + dll)
+
 ## Remove un needed folders
 for rm in [
   'dist',
@@ -223,11 +234,16 @@ for rm in [
   app_path + 'PyQt5\\Qt\\translations',
   app_path + 'PyQt5\\Qt\\plugins\\imageformats',
   app_path + 'PyQt5\\Qt\\plugins\\iconengines',
-  app_path + 'altgraph-0.17.dist-info',
-  app_path + 'pyinstaller-4.9.dist-info',
-  app_path + 'setuptools-41.2.0.dist-info'
+  app_path + 'PyQt5\\Qt\\plugins\\generic'
   ]:
     shutil.rmtree(rm)
+
+for _dir in os.listdir(app_path):
+    if _dir.endswith('.dist-info'):
+        try:
+            shutil.rmtree(os.path.join(app_path, _dir))
+        except:
+            pass
 
 # Dynamically add files list to iss file
 files_list = []

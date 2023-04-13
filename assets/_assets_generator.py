@@ -1,8 +1,11 @@
 import os
 
+# Move to src path directly
+src_path = '\\'.join(os.getcwd().split('\\')[:-1] + ['src', 'assets.py'])
+
 get_raw = lambda f: open(f, 'rb').read()
 
-with open('assets.py', 'w') as assets_file:
+with open(src_path, 'w') as assets_file:
     for asset_file in filter(lambda i: i.rsplit('.', 1)[1].lower() in 'pngjpgjpegwavmp3', os.listdir()):
 
         # Split file into name and extension

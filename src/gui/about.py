@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import QMainWindow
-# from PyQt5.QtCore import pyqtSignal, QEvent, QObject
 from PyQt5.QtGui import QPixmap
 
 from ui.ui_about import Ui_MainWindow
 from tools.qtools import clickable
 from tools.utils import goto
 from assets import twitter_icon, linkedin_icon, github_icon, reddit_icon, app_icon
+from constants import VERSION
 
 class About(QMainWindow, Ui_MainWindow):
     def __init__(self, elmocut, icon):
@@ -30,7 +30,7 @@ class About(QMainWindow, Ui_MainWindow):
             clickable(lbl).connect(url)
             self.setImage(lbl, icon)
 
-        self.lblAppName.setText(f'elmoCut v{self.elmocut.version}')
+        self.lblAppName.setText(f'elmoCut v{VERSION}')
         self.lblMyName.setText('Khaled El-Morshedy')
         self.lblNickName.setText('(elmoiv)')
     
