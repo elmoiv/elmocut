@@ -1,11 +1,11 @@
 from concurrent.futures.thread import ThreadPoolExecutor
-from scapy.all import Ether, arping, conf, get_if_addr
+from scapy.all import arping
 from time import sleep
-from re import findall
-
 from networking.nicknames import Nicknames
 from tools.utils import *
 from constants import *
+from models.device import Device
+from enums import DeviceType
 
 class Scanner():
     def __init__(self):
@@ -45,24 +45,24 @@ class Scanner():
         """
         Flush ARP cache
         """
-        arp_cmd = terminal('arp -d *')
+        arp_cmd = terminal(CMD_ARP_CACHE_FLUSH)
         # Fix: Some systems has older versions of arp.exe
         # We use netsh instead
         if 'The parameter is incorrect' in arp_cmd:
-            terminal('netsh interface ip delete arpcache')
+            terminal(CMD_ARP_CACHE_FLUSH_NEW)
 
     def add_me(self):
         """
         Get My info and append to self.devices
         """
-        self.me = {
-            'ip':       self.my_ip,
-            'mac':      self.my_mac,
-            'vendor':   get_vendor(self.my_mac),
-            'type':     'Me',
-            'name':     '',
-            'admin':    True
-        }
+        self.me = Device(
+            ip = self.my_ip,
+            mac = self.my_mac,
+            vendor = get_vendor(self.my_mac),
+            dtype = DeviceType.OWNER,
+            name = '',
+            admin = True
+        )
         
         self.devices.insert(0, self.me)
 
@@ -70,14 +70,14 @@ class Scanner():
         """
         Get Gateway info and append to self.devices
         """
-        self.router = {
-            'ip':       self.router_ip,
-            'mac':      self.router_mac,
-            'vendor':   get_vendor(self.router_mac),
-            'type':     'Router',
-            'name':     '',
-            'admin':    True
-        }
+        self.router = Device(
+            ip = self.router_ip,
+            mac = self.router_mac,
+            vendor = get_vendor(self.router_mac),
+            dtype = DeviceType.ROUTER,
+            name = '',
+            admin = True
+        )
 
         self.devices.insert(0, self.router)
 
@@ -109,24 +109,24 @@ class Scanner():
                 unique.append(mac)
 
             self.devices.append(
-                {
-                    'ip':     ip,
-                    'mac':    mac,
-                    'vendor': get_vendor(mac),
-                    'type':   'User',
-                    'name':   nicknames.get_name(mac),
-                    'admin':  False
-                }
+                Device(
+                    ip = ip,
+                    mac = mac,
+                    vendor = get_vendor(mac),
+                    dtype = DeviceType.USER,
+                    name = nicknames.get_name(mac),
+                    admin = False
+                )
             )
         
         # Remove device with old ip
         for device in self.devices[:]:
-            mac, ip = device['mac'], device['ip']
+            mac, ip = device.mac, device.ip
             if self.old_ips.get(mac, ip) != ip:
                 self.devices.remove(device)
         
         # Re-create devices old ips dict
-        self.old_ips = {d['mac']: d['ip'] for d in self.devices}
+        self.old_ips = {d.mac: d.ip for d in self.devices}
 
         self.add_me()
         self.add_router()
@@ -140,7 +140,7 @@ class Scanner():
         Showing system arp cache after pinging
         """
         # Correct scan result when working with specific interface
-        scan_result = terminal(f'arp -a -N {self.my_ip} | findstr dynamic')
+        scan_result = terminal(CMD_ARP_CACHE(self.my_ip))
         
         if not scan_result:
             print('ARP error has been caught!')
@@ -198,5 +198,5 @@ class Scanner():
         """
         Ping a specific ip with native command "ping -n"
         """
-        terminal(f'ping -n 1 {ip}', decode=False)
+        terminal(CMD_PING_DEVICE(ip), decode=False)
         self.__ping_done += 1

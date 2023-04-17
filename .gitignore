@@ -139,5 +139,5 @@ dmypy.json
 Community Stuff.txt
 new features.txt
 TODO.txt
-/src/gui/main.py_backup
+*.py_backup
 /src/tools/restart.exe

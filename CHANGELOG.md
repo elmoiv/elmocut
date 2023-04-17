@@ -1,3 +1,14 @@
+## [1.0.7] - 2023-02-22
+- **[NEW]** Decreased RAM usage by 64%.
+
+![image](https://user-images.githubusercontent.com/31712173/220607944-60737ae5-4e39-4758-8d54-b8682586667b.png)
+
+
+- #53 Settings directory changed to `%appdata%\elmocut`.
+- Fixed kill buttons not working when elmocut starts offline.
+- Updated [manuf](https://github.com/coolbho3k/manuf) MAC vendors database.
+- Improved performance.
+
 ## [1.0.6] - 2022-02-24
 - **[New]** Double-click any device to add nickname.
 

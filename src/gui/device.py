@@ -3,7 +3,7 @@ from PyQt5.QtGui import QPalette, QColor
 from networking.nicknames import Nicknames
 from ui.ui_device import Ui_MainWindow
 
-class Device(QMainWindow, Ui_MainWindow):
+class DeviceWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, elmocut, icon):
         super().__init__()
         self.elmocut = elmocut
@@ -25,10 +25,10 @@ class Device(QMainWindow, Ui_MainWindow):
         self.txtNickname.returnPressed.connect(self.changeName)
     
     def load(self, device, current_row):
-        self.lblIP.setText(device['ip'])
-        self.lblMAC.setText(device['mac'])
-        if device['name'] != '-':
-            self.txtNickname.setText(device['name'])
+        self.lblIP.setText(device.ip)
+        self.lblMAC.setText(device.mac)
+        if device.name != '-':
+            self.txtNickname.setText(device.name)
         else:
             self.txtNickname.setText('')
         self.current_row = current_row
@@ -42,19 +42,19 @@ class Device(QMainWindow, Ui_MainWindow):
     def changeName(self):
         name = self.txtNickname.text().strip()
         if not name or name == '-':
-            name = self.device['name']
+            name = self.device.name
             return self.instantApplyChanges(name)
-        self.__nicknames.set_name(self.device['mac'], name)
+        self.__nicknames.set_name(self.device.mac, name)
         self.instantApplyChanges(name)
     
     def resetName(self):
         name = '-'
-        self.__nicknames.reset_name(self.device['mac'])
+        self.__nicknames.reset_name(self.device.mac)
         self.txtNickname.setText('')
         self.instantApplyChanges(name)
 
     def instantApplyChanges(self, name):
-        self.device['name'] = name
+        self.device.name = name
         self.elmocut.fillTableRow(self.current_row, self.device)
         self.close()
 
