@@ -23,6 +23,10 @@
 </p>
 <p align=center>
   <a href="https://sourceforge.net/projects/elmocut/" target="_blank">
+    <img src="https://sourceforge.net/cdn/syndication/badge_img/3324963/oss-community-leader-black?achievement=oss-community-choice&r=https://sourceforge.net/p/elmocut/admin/files/badges/" alt="elmoCut - Eye candy ARP spoofer for Windows | SourceForge" style="width: 120px; height: 120px;" width="120" height="120" />
+  </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://sourceforge.net/projects/elmocut/" target="_blank">
     <img src="https://sourceforge.net/cdn/syndication/badge_img/3324963/oss-community-choice-black?achievement=oss-community-choice&r=https://sourceforge.net/p/elmocut/admin/files/badges/" alt="elmoCut - Eye candy ARP spoofer for Windows | SourceForge" style="width: 120px; height: 120px;" width="120" height="120" />
   </a>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
