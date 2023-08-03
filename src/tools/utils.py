@@ -1,18 +1,23 @@
-from scapy.all import conf, get_if_list, get_windows_if_list, get_if_hwaddr
+from scapy.all import conf, get_if_list, get_windows_if_list
 from subprocess import check_output, CalledProcessError
-from socket import socket
+from socket import socket, AF_INET, SOCK_DGRAM
 from threading import Thread
 from manuf import manuf
+from scapy.layers.l2 import ARP, Ether
+from scapy.sendrecv import srp
+import netifaces
 
-from models.ifaces import NetFace
-from constants import *
+from constants import DUMMY_IFACE, GLOBAL_MAC
+from networking.ifaces import NetFace
 
 p = manuf.MacParser()
+
 
 def terminal(command, shell=True, decode=True):
     """
     Terminal commands via Subprocess
     """
+    cmd = None
     try:
         cmd = check_output(command, shell=shell)
         return cmd.decode() if decode else None
@@ -20,6 +25,7 @@ def terminal(command, shell=True, decode=True):
         return None
     except UnicodeDecodeError:
         return str(cmd)
+
 
 def threaded(fn):
     """
@@ -31,11 +37,13 @@ def threaded(fn):
         return t
     return run
 
+
 def get_vendor(mac):
     """
     Get vendor from manuf wireshark mac database
     """
     return p.get_manuf(mac) or 'None'
+
 
 def good_mac(mac):
     """
@@ -43,34 +51,47 @@ def good_mac(mac):
     """
     return mac.upper().replace('-', ':')
 
+
 def get_my_ip(iface_name):
     """
-    Get Gateway IP if connected else None
+    Get IP address of a specific network interface
     """
-    response = terminal('netsh interface ip show address '
-                      f'"{iface_name}" | findstr "IP"')
-    return response.split()[-1] if response else '127.0.0.1'
-
-def get_gateway_ip(iface_name):
-    """
-    Get Gateway IP if connected else None
-    """
-    response = terminal('netsh interface ip show address '
-                      f'"{iface_name}" | findstr /i default')
-    return response.split()[-1] if response else '0.0.0.0'
-
-def get_gateway_mac(iface_ip, router_ip):
-    response = terminal(f'arp -a {router_ip} -N {iface_ip} | findstr "dynamic static"')
     try:
-        return good_mac(response.split()[1])
-    except:
-        return GLOBAL_MAC
+        s = socket(AF_INET, SOCK_DGRAM)
+        s.connect((iface_name, 0))
+        return s.getsockname()[0]
+    except OSError:
+        return '127.0.0.1'
+
+
+def get_gateway_ip():
+    """
+    Get Gateway IP if connected else None
+    """
+    try:
+        return netifaces.gateways()['default'][netifaces.AF_INET][0]
+    except KeyError:
+        return '0.0.0.0'
+
+
+def get_gateway_mac(router_ip):
+    """
+    Get Gateway MAC address
+    """
+    arp_request = ARP(pdst=router_ip)
+    broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")
+    arp_request_broadcast = broadcast / arp_request
+    answered_list = srp(arp_request_broadcast, timeout=1, verbose=False)[0]
+
+    return answered_list[0][1].hwsrc if answered_list else GLOBAL_MAC
+
 
 def goto(url):
     """
     Open url in default browser
     """
     terminal(f'start "" "{url}"')
+
 
 def check_connection(func):
     """
@@ -82,6 +103,7 @@ def check_connection(func):
             return func(args[0])
     return wrapper
 
+
 def get_ifaces():
     """
     Get current working interfaces
@@ -92,6 +114,7 @@ def get_ifaces():
         if iface['guid'] in pcap and iface['ips'] != []:
             yield NetFace(iface)
 
+
 def get_default_iface():
     """
     Get default pcap interface
@@ -100,6 +123,7 @@ def get_default_iface():
         if iface.guid in str(conf.iface):
             return iface
     return NetFace(DUMMY_IFACE)
+
 
 def get_iface_by_name(name):
     """
@@ -110,6 +134,7 @@ def get_iface_by_name(name):
             return iface
     return get_default_iface()
 
+
 def is_connected(current_iface=get_default_iface()):
     """
     Checks if there are any IPs in Default Gateway sections
@@ -118,12 +143,12 @@ def is_connected(current_iface=get_default_iface()):
     if current_iface.name == 'NULL':
         return False
 
-    ipconfig_output = terminal('ipconfig | findstr /i gateway')
-    if ipconfig_output != None:
-        return any(i.isdigit() for i in ipconfig_output)
+    ipconfig_output = get_gateway_ip()
+    if ipconfig_output != '0.0.0.0':
+        return ipconfig_output
 
     # Alternative way if ipconfig has error in some systems
-    ## Slower than ipconfig workaround
+    # Slower than ipconfig workaround
     try:
         socket().connect(('8.8.8.8', 53))
         return True

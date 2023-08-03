@@ -32,8 +32,8 @@ class Scanner():
         self.iface = get_iface_by_name(self.iface.name)
         self.devices = []
 
-        self.router_ip = get_gateway_ip(self.iface.name)
-        self.router_mac = get_gateway_mac(self.iface.ip, self.router_ip)
+        self.router_ip = get_gateway_ip()
+        self.router_mac = get_gateway_mac(self.router_ip)
 
         self.my_ip = get_my_ip(self.iface.name)
         self.my_mac = good_mac(self.iface.mac)
