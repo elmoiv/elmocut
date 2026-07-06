@@ -39,12 +39,6 @@
     <img src="https://sourceforge.net/cdn/syndication/badge_img/3324963/oss-sf-favorite-black?achievement=oss-sf-favorite&r=https://sourceforge.net/p/elmocut/admin/files/badges/" alt="elmoCut - Eye candy ARP spoofer for Windows | SourceForge" style="width: 120px; height: 120px;" width="120" height="120" />
   </a>
 </p>
-<!-- <p align=center>
-  <a href="https://www.producthunt.com/posts/elmocut?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-elmocut" target="_blank">
-    <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=320352&theme=light" alt="elmoCut - Eye candy ARP spoofer for Windows | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" />
-  </a>
-</p> -->
-
 
 
 <hr>
@@ -115,6 +109,7 @@ One of it's main features is to use as low CPU and RAM usage as possible while o
 - Clean UI.
 - Switch between available interfaces.
 - One click to block all devices.
+- Sniff the traffic of any device on the netwrok.
 - Re-kill devices that changed their ip during block.
 - Remember killed devices before exit.
 - Start with windows.
