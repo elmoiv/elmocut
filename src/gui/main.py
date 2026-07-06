@@ -1,12 +1,10 @@
 from qdarkstyle import load_stylesheet
 from pyperclip import copy
 
-from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QMessageBox, \
-                            QMenu, QSystemTrayIcon, QAction
-from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import Qt
-from PyQt5.QtWinExtras import QWinTaskbarButton
-
+from PyQt6.QtWidgets import QMainWindow, QTableWidgetItem, QMessageBox, \
+                            QMenu, QSystemTrayIcon
+from PyQt6.QtGui import QPixmap, QIcon, QAction
+from PyQt6.QtCore import Qt
 from ui.ui_main import Ui_MainWindow
 
 from gui.settings import Settings
@@ -15,9 +13,10 @@ from gui.device import DeviceWindow
 
 from networking.scanner import Scanner
 from networking.killer import Killer
+from networking.diverter import ElmoDivert
 
 from tools.qtools import colored_item, MsgType, Buttons, clickable
-from tools.utils_gui import set_settings, get_settings
+from tools.utils_gui import set_settings, get_settings, restart_gui_app
 from tools.utils import goto, is_connected
 
 from assets import *
@@ -25,8 +24,17 @@ from assets import *
 from bridge import ScanThread, UpdateThread
 
 from constants import *
+import os
+import signal
+import sys
 
 # from qt_material import build_stylesheet
+
+def force_close():
+    try:
+        os.kill(os.getpid(), signal.SIGTERM)
+    except:
+        sys.exit(0)
 
 class ElmoCut(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -36,18 +44,18 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         # Add window icon
         self.setWindowIcon(self.icon)
         self.setupUi(self)
-        # stylesheet = build_stylesheet('dark_teal.xml', 0, {}, 'theme')
-        # self.setStyleSheet(stylesheet)
         self.setStyleSheet(load_stylesheet())
         
         # Main Props
-        self.scanner = Scanner()
+        self.watched_devices: dict[str, ElmoDivert] = {}
+        self.scanner = Scanner(self)
         self.killer = Killer()
 
         # Settings props
         self.minimize = True
         self.remember = False
         self.autoupdate = True
+        self.ip_forwarding_enabled = False
 
         self.from_tray = False
 
@@ -62,7 +70,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         # Initialize other sub-windows
         self.settings_window = Settings(self, self.icon)
         self.about_window = About(self, self.icon)
-        self.device_window = DeviceWindow(self, self.icon)
+        self.device_windows: dict[str, DeviceWindow] = {}
 
         # Connect buttons
         self.buttons = [
@@ -93,6 +101,8 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.tableScan.setColumnCount(len(TABLE_HEADER_LABELS))
         self.tableScan.verticalHeader().setVisible(False)
         self.tableScan.setHorizontalHeaderLabels(TABLE_HEADER_LABELS)
+        self.tableScan.setShowGrid(False)
+        # self.tableScan.setStyleSheet("QTableWidget::item { border: none; }")
 
         '''
            System tray icon and it's tray menu
@@ -168,7 +178,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.settings_window.loadInterfaces()
         self.settings_window.currentSettings()
         self.settings_window.show()
-        self.settings_window.setWindowState(Qt.WindowNoState)
+        self.settings_window.setWindowState(Qt.WindowState.WindowNoState)
 
     def openAbout(self):
         """
@@ -176,7 +186,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         self.about_window.hide()
         self.about_window.show()
-        self.about_window.setWindowState(Qt.WindowNoState)
+        self.about_window.setWindowState(Qt.WindowState.WindowNoState)
 
     def applySettings(self):
         """
@@ -187,15 +197,37 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
     def trayShowClicked(self):
         self.show()
         # Restore window state if was minimized before hidden
-        self.setWindowState(Qt.WindowNoState)
+        self.setWindowState(Qt.WindowState.WindowNoState)
         self.activateWindow()
 
     def tray_clicked(self, event):
         """
         Show elmoCut when tray icon is left-clicked
         """
-        if event == QSystemTrayIcon.Trigger:
+        if event == QSystemTrayIcon.ActivationReason.Trigger:
             self.trayShowClicked()
+
+    def sync_ip_forwarding_state(self):
+        """
+        Detect if IP forwarding was changed manually outside elmoCut
+        (e.g. via netsh or the registry directly) and reconcile our
+        stored setting + UI checkbox + in-memory flag to match reality.
+        """
+        from networking.diverter import ElmoDivert
+        actual = ElmoDivert.is_ip_forwarding_enabled(self.scanner.iface.name)
+        stored = get_settings('ip_forwarding')
+
+        self.ip_forwarding_enabled = actual
+
+        if actual != stored:
+            set_settings('ip_forwarding', actual)
+            self.settings_window.chkIpForwarding.setChecked(actual)
+
+            self.log(
+                f"IP forwarding was {'enabled' if actual else 'disabled'} "
+                "outside elmoCut — settings updated to match.",
+                'yellow'
+            )
 
     def hide_all(self):
         """
@@ -206,25 +238,71 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.about_window.hide()
 
     def quit_all(self):
-        """
-        Unkill any killed device on exit from tray icon
-        """
+        self.stop_all_watching() 
         self.killer.unkill_all()
         self.settings_window.close()
         self.about_window.close()
+        for window in list(self.device_windows.values()):
+            window.close()
         self.tray_icon.hide()
         self.from_tray = True
         self.close()
 
-    def showEvent(self, event):
+    def stop_all_watching(self):
         """
-        https://stackoverflow.com/a/60123914/5305953
-        Connect TaskBar icon to progressbar
+        Stop every active URL-watching session.
+        Only ever called when elmoCut itself is closing.
         """
-        self.taskbar_button = QWinTaskbarButton()
-        self.taskbar_progress = self.taskbar_button.progress()
-        self.taskbar_button.setWindow(self.windowHandle())
-        self.pgbar.valueChanged.connect(self.taskbar_progress.setValue)
+        for mac, divert in list(self.watched_devices.items()):
+            divert.stop()
+        self.watched_devices.clear()
+
+    def request_enable_ip_forwarding(self):
+        """
+        Prompt to enable IP forwarding when watching is attempted while it's off.
+        """
+        if MsgType.WARN(
+            self,
+            'IP Forwarding Required',
+            'IP forwarding is currently disabled.\n'
+            'You need to enable it first to watch device traffic.\n\n'
+            'Enabling it will make killing devices not effective, '
+            'and all currently killed devices will be unkilled.\n\n'
+            'Enable IP forwarding now?',
+            Buttons.YES | Buttons.NO
+        ) == Buttons.NO:
+            return False
+
+        ElmoDivert.enable_ip_forwarding(self.scanner.iface.name)
+        set_settings('ip_forwarding', True)
+        self.ip_forwarding_enabled = True
+        self.killer.unkill_all()
+        set_settings('killed', [])
+
+        return True
+
+    def request_disable_ip_forwarding(self):
+        """
+        Prompt to disable IP forwarding when killing is attempted while it's on.
+        """
+        if MsgType.WARN(
+            self,
+            'Disable IP Forwarding Required',
+            'IP forwarding is currently enabled.\n'
+            'To kill devices you must disable it first.\n\n'
+            'Disabling it will make URL watching not effective, '
+            'and all currently watched devices will be unwatched.\n\n'
+            'Disable IP forwarding now?',
+            Buttons.YES | Buttons.NO
+        ) == Buttons.NO:
+            return False
+
+        ElmoDivert.disable_ip_forwarding(self.scanner.iface.name)
+        set_settings('ip_forwarding', False)
+        self.ip_forwarding_enabled = False
+        self.stop_all_watching()
+
+        return True
 
     def resizeEvent(self, event=True):
         """
@@ -240,6 +318,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         # If event recieved from tray icon
         if self.from_tray:
+            force_close()
             event.accept()
             return
         
@@ -252,9 +331,13 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             return
 
         ## If not, ukill all and shutdown
+        self.stop_all_watching()
         self.killer.unkill_all()
         self.settings_window.close()
         self.about_window.close()
+
+        for window in list(self.device_windows.values()):
+            window.close()
 
         self.hide()
         self.tray_icon.hide()
@@ -266,6 +349,8 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             'Enable minimized from settings\n'
             'to be able to run in background.'
         )
+
+        force_close()
 
         event.accept()
 
@@ -292,30 +377,44 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         Disable kill, unkill buttons when admins are selected
         """
-        not_enabled = not self.current_index().admin
-        
-        self.btnKill.setEnabled(not_enabled)
-        self.btnUnkill.setEnabled(not_enabled)
+        device: Device = self.current_index()
+        is_admin = device.admin
+        is_watched = device.mac in self.watched_devices
+        self.btnKill.setEnabled(not (is_admin or is_watched))
+        self.btnUnkill.setEnabled(not (is_admin or is_watched))
     
     def deviceDoubleClicked(self):
         """
-        Open device info window (when not admin)
+        Open an independent window per device.
+        Each device gets its own DeviceWindow instance so multiple
+        devices can be watched simultaneously without interfering.
         """
-        device = self.current_index()
+        device: Device = self.current_index()
         if device.admin:
             self.log('Admin device', color='orange')
             return
-        
-        self.device_window.load(device, self.tableScan.currentRow())
-        self.device_window.hide()
-        self.device_window.show()
-        self.device_window.setWindowState(Qt.WindowNoState)
+
+        if device.mac in self.watched_devices and self.watched_devices[device.mac].is_running():
+            self.log(f"{device.ip} is already being watched", 'yellow')
+
+        # Reuse the window if this exact device already has one open,
+        # otherwise spin up a brand-new independent window
+        window = self.device_windows.get(device.mac)
+        if window is None:
+            window = DeviceWindow(self, self.icon)
+            self.device_windows[device.mac] = window
+
+        window.load(device, self.tableScan.currentRow())
+        window.show()
+        window.setWindowState(Qt.WindowState.WindowNoState)
+        window.activateWindow()
+        window.raise_()
     
     def fillTableCell(self, row, column, text, colors=[]):
         # Center text in table cell
         ql = QTableWidgetItem()
         ql.setText(text)
-        ql.setTextAlignment(Qt.AlignCenter)
+        ql.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
 
         if colors:
             colored_item(ql, *colors)
@@ -324,11 +423,14 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.tableScan.setItem(row, column, ql)
 
     def fillTableRow(self, row, device: Device):
-        colors = []
         if device.admin:
             colors = ['#00ff00', '#000000']
+        elif device.mac in self.watched_devices:
+            colors = ['#ffff00', '#000000']
+        elif device.mac in self.killer.killed:
+            colors = ['#ff0000', '#ffffff']
         else:
-            colors = ['#ff0000', '#ffffff'] * (device.mac in self.killer.killed)
+            colors = []
         
         props = device.to_dict()
         del props['admin']
@@ -345,6 +447,7 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         self.tableScan.setRowCount(len(self.scanner.devices))
 
         for row, device in enumerate(self.scanner.devices):
+            print(f'>> {device}')
             self.fillTableRow(row, device)
         
         status = f'{len(self.scanner.devices) - 2} devices' \
@@ -369,12 +472,14 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         # first device in list is the router
         self.killer.router = self.scanner.router
 
+        watched_macs = set(self.watched_devices.keys())
+
         # re-kill paused and update to current devices
-        self.killer.rekill_stored(self.scanner.devices)
+        self.killer.rekill_stored(self.scanner.devices, exclude_macs=watched_macs)
         
         # re-kill saved devices after exit
         for rem_device in self.scanner.devices:
-            if rem_device.mac in get_settings('killed') * self.remember:
+            if rem_device.mac in get_settings('killed') * self.remember and rem_device.mac not in watched_macs:
                 self.killer.kill(rem_device)
 
         # clear old database
@@ -400,6 +505,19 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             return
 
         device = self.current_index()
+
+        if device.mac in self.watched_devices:
+            MsgType.WARN(
+                self,
+                'Cannot Kill Device!',
+                'This device is currently being watched.\nStop watching it first to kill it.'
+            )
+            return
+
+        if self.ip_forwarding_enabled:
+            if not self.request_disable_ip_forwarding():
+                return
+            self.showDevices()
         
         if device.mac in self.killer.killed:
             self.log('Device is already killed', 'red')
@@ -444,7 +562,12 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         if not self.connected():
             return
-        
+
+        if self.ip_forwarding_enabled:
+            if not self.request_disable_ip_forwarding():
+                return
+            self.showDevices()
+
         self.killer.kill_all(self.scanner.devices)
         set_settings('killed', list(self.killer.killed) * self.remember)
         self.log('Killed All devices', 'fuchsia')
@@ -486,21 +609,19 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             return
 
         self.centralwidget.setEnabled(False)
-        
+
         # Save copy of killed devices
         self.killer.store()
-        
+
         self.killer.unkill_all()
-        
+
         self.log(
             ['Arping', 'Pinging'][scan_type] + ' your network...',
             ['aqua', 'fuchsia'][scan_type]
         )
-        
+
         self.pgbar.setVisible(True)
-        self.taskbar_progress.setVisible(True)
         self.pgbar.setMaximum(self.scanner.device_count)
-        self.taskbar_progress.setMaximum(self.scanner.device_count)
         self.pgbar.setValue(self.scanner.device_count * (not scan_type))
         
         self.scan_thread.scanner = self.scanner
@@ -513,7 +634,6 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         self.centralwidget.setEnabled(True)
         self.pgbar.setVisible(False)
-        self.taskbar_progress.setVisible(False)
         self.processDevices()
     
     def UpdateThread_Starter(self):

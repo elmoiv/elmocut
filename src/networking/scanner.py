@@ -6,9 +6,12 @@ from tools.utils import *
 from constants import *
 from models.device import Device
 from enums import DeviceType
+from scapy.all import sniff, DHCP, BOOTP, Ether
+from tools.utils import threaded, good_mac
 
 class Scanner():
-    def __init__(self):
+    def __init__(self, _parent):
+        self.parent = _parent
         self.iface = get_default_iface()
         self.device_count = 25
         self.max_threads = 8
@@ -124,12 +127,20 @@ class Scanner():
             mac, ip = device.mac, device.ip
             if self.old_ips.get(mac, ip) != ip:
                 self.devices.remove(device)
+
+        present_macs = {d.mac for d in self.devices}
+        for mac in set(self.parent.watched_devices.keys()) - present_macs:
+            window = self.parent.device_windows.get(mac)
+            if window and window.device:
+                self.devices.append(window.device)
         
         # Re-create devices old ips dict
         self.old_ips = {d.mac: d.ip for d in self.devices}
 
         self.add_me()
         self.add_router()
+
+        print(f'Scanner found {len(self.devices)} devices: {self.devices}')
 
         # Clear arp cache to avoid duplicates next time
         if unique:
@@ -200,3 +211,30 @@ class Scanner():
         """
         terminal(CMD_PING_DEVICE(ip), decode=False)
         self.__ping_done += 1
+
+class DhcpSniffer:
+    def __init__(self, iface):
+        self.iface = iface
+        self.hostnames = {}  # mac -> hostname
+
+    @threaded
+    def start(self):
+        sniff(
+            filter="udp and (port 67 or port 68)",
+            prn=self._handle_packet,
+            store=0,
+            iface=self.iface.name
+        )
+
+    def _handle_packet(self, pkt):
+        if DHCP not in pkt or Ether not in pkt:
+            return
+
+        mac = good_mac(pkt[Ether].src)
+        opts = {opt[0]: opt[1] for opt in pkt[DHCP].options if isinstance(opt, tuple)}
+        hostname = opts.get('hostname')
+
+        if hostname:
+            if isinstance(hostname, bytes):
+                hostname = hostname.decode(errors='ignore')
+            self.hostnames[mac] = hostname

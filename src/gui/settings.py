@@ -1,11 +1,11 @@
-from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtGui import QFont
+from PyQt6.QtCore import Qt
 from qdarkstyle import load_stylesheet
 import os
-
+from networking.diverter import ElmoDivert
 from tools.utils_gui import import_settings, export_settings, get_settings, \
-                            add_to_startup, remove_from_startup, set_settings
+                            add_to_startup, remove_from_startup, set_settings, restart_gui_app
 from tools.qtools import MsgType, Buttons
 from tools.utils import get_ifaces, get_default_iface, get_iface_by_name
 
@@ -50,6 +50,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         is_remember   =  self.chkRemember.isChecked()
         is_autoupdate =  self.chkAutoupdate.isChecked()
         iface         =  self.comboInterface.currentText()
+        is_ip_forward =  self.chkIpForwarding.isChecked()
 
         exe_path = os.path.join(os.getcwd(), 'elmocut.exe')
         if is_autostart:
@@ -63,6 +64,8 @@ class Settings(QMainWindow, Ui_MainWindow):
         killed_from_elmo = list(self.elmocut.killer.killed)
         killed_all = list(set(killed_from_json + killed_from_elmo)) * is_remember
 
+        old_ip_forward = get_settings('ip_forwarding')
+
         export_settings(
             [
             is_dark,
@@ -74,7 +77,8 @@ class Settings(QMainWindow, Ui_MainWindow):
             is_autoupdate,
             threads,
             iface,
-            nicknames.nicknames_database
+            nicknames.nicknames_database,
+            is_ip_forward
             ]
         )
 
@@ -84,6 +88,41 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.updateElmocutSettings()
         # Fix horizontal headerfont reverts to normal after applying settings
         self.elmocut.tableScan.horizontalHeader().setFont(QFont('Consolas', 11))
+
+        if is_ip_forward and not old_ip_forward:
+            ElmoDivert.enable_ip_forwarding(self.elmocut.scanner.iface.name)
+            self.elmocut.killer.unkill_all()
+            set_settings('killed', [])
+
+            MsgType.INFO(
+                self,
+                'IP Forwarding Enabled',
+                'IP forwarding has been enabled.\n'
+                'Killing devices will no longer be effective, and all '
+                'previously killed devices have been unkilled.\n\n'
+                'elmoCut needs to restart to apply this change.\n'
+                'If it still does not take effect, please restart your PC.'
+            )
+            restart_gui_app(self.elmocut)
+            self.elmocut.quit_all()
+            return
+
+        if not is_ip_forward and old_ip_forward:
+            ElmoDivert.disable_ip_forwarding(self.elmocut.scanner.iface.name)
+            self.elmocut.stop_all_watching()
+
+            MsgType.INFO(
+                self,
+                'IP Forwarding Disabled',
+                'IP forwarding has been disabled.\n'
+                'URL watching will no longer be effective, and all '
+                'currently watched devices have been stopped.\n\n'
+                'elmoCut needs to restart to apply this change.\n'
+                'If it still does not take effect, please restart your PC.'
+            )
+            restart_gui_app(self.elmocut)
+            self.elmocut.quit_all()
+            return
 
         if not silent_apply:
             MsgType.INFO(
@@ -100,7 +139,7 @@ class Settings(QMainWindow, Ui_MainWindow):
             )
 
             # Restart elmoCut via restart.exe
-            __import__('os').system('start "" restart.exe')
+            restart_gui_app(self.elmocut)
             self.elmocut.quit_all()
         
         self.close()
@@ -140,6 +179,7 @@ class Settings(QMainWindow, Ui_MainWindow):
         self.elmocut.minimize = s['minimized']
         self.elmocut.remember = s['remember']
         self.elmocut.autoupdate = s['autoupdate']
+        self.elmocut.ip_forwarding_enabled = s['ip_forwarding']
         self.elmocut.scanner.device_count = s['count']
         self.elmocut.scanner.max_threads = s['threads']
         
@@ -152,6 +192,7 @@ class Settings(QMainWindow, Ui_MainWindow):
     def currentSettings(self):
         s = import_settings()
         [self.rdbLight, self.rdbDark][s['dark']].setChecked(True)
+        self.chkIpForwarding.setChecked(s['ip_forwarding'])
         self.chkAutostart.setChecked(s['autostart'])
         self.chkMinimized.setChecked(s['minimized'])
         self.chkRemember.setChecked(s['remember'])
@@ -165,7 +206,7 @@ class Settings(QMainWindow, Ui_MainWindow):
             set_settings('iface', get_default_iface().name)
             s = import_settings()
         
-        index = self.comboInterface.findText(s['iface'], Qt.MatchFixedString)
+        index = self.comboInterface.findText(s['iface'], Qt.MatchFlag.MatchFixedString)
         self.comboInterface.setCurrentIndex(index * (index >= 0))
         
         self.setStyleSheet(load_stylesheet() if s['dark'] else '')

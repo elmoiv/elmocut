@@ -62,6 +62,8 @@ exe = EXE(pyz,
           bootloader_ignore_signals=False,
           strip=False,
           upx=False,
+          contents_directory='.',
+          uac_admin=True,
           console={4} , version='tmp.txt', icon='{0}exe\\\\icon.ico')
 
 coll = COLLECT(exe,
@@ -103,6 +105,9 @@ LZMADictionarySize=1048576
 LZMANumFastBytes=273
 WizardStyle=modern
 
+[InstallDelete]
+Type: filesandordirs; Name: "{{app}}\*"
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
@@ -119,13 +124,13 @@ Name: "{{autodesktop}}\\{{#MyAppName}}"; Filename: "{{app}}\\{{#MyAppExeName}}";
 Name: "{{userappdata}}\\Microsoft\\Internet Explorer\\Quick Launch\\{{#MyAppName}}"; Filename: "{{app}}\\{{#MyAppExeName}}"; Tasks: quicklaunchicon
 
 [Run]
-Filename: "{{app}}\\{{#MyAppExeName}}"; Description: "{{cm:LaunchProgram,{{#StringChange(MyAppName, '&', '&&')}}}}"; Flags: nowait postinstall skipifsilent'''
+Filename: "{{app}}\\{{#MyAppExeName}}"; Description: "{{cm:LaunchProgram,{{#StringChange(MyAppName, '&', '&&')}}}}"; Flags: nowait postinstall skipifsilent shellexec'''
 
-excluded_binaries = ['api-ms-win-core-console-l1-1-0.dll', 'api-ms-win-core-datetime-l1-1-0.dll', 'api-ms-win-core-debug-l1-1-0.dll', 'api-ms-win-core-errorhandling-l1-1-0.dll', 'api-ms-win-core-file-l1-1-0.dll', 'api-ms-win-core-file-l1-2-0.dll', 'api-ms-win-core-file-l2-1-0.dll', 'api-ms-win-core-handle-l1-1-0.dll', 'api-ms-win-core-heap-l1-1-0.dll', 'api-ms-win-core-interlocked-l1-1-0.dll', 'api-ms-win-core-libraryloader-l1-1-0.dll', 'api-ms-win-core-localization-l1-2-0.dll', 'api-ms-win-core-memory-l1-1-0.dll', 'api-ms-win-core-namedpipe-l1-1-0.dll', 'api-ms-win-core-processenvironment-l1-1-0.dll', 'api-ms-win-core-processthreads-l1-1-0.dll', 'api-ms-win-core-processthreads-l1-1-1.dll', 'api-ms-win-core-profile-l1-1-0.dll', 'api-ms-win-core-rtlsupport-l1-1-0.dll', 'api-ms-win-core-string-l1-1-0.dll', 'api-ms-win-core-synch-l1-1-0.dll', 'api-ms-win-core-synch-l1-2-0.dll', 'api-ms-win-core-sysinfo-l1-1-0.dll', 'api-ms-win-core-timezone-l1-1-0.dll', 'api-ms-win-core-util-l1-1-0.dll', 'api-ms-win-crt-conio-l1-1-0.dll', 'api-ms-win-crt-convert-l1-1-0.dll', 'api-ms-win-crt-environment-l1-1-0.dll', 'api-ms-win-crt-filesystem-l1-1-0.dll', 'api-ms-win-crt-heap-l1-1-0.dll', 'api-ms-win-crt-locale-l1-1-0.dll', 'api-ms-win-crt-math-l1-1-0.dll', 'api-ms-win-crt-multibyte-l1-1-0.dll', 'api-ms-win-crt-process-l1-1-0.dll', 'api-ms-win-crt-runtime-l1-1-0.dll', 'api-ms-win-crt-stdio-l1-1-0.dll', 'api-ms-win-crt-string-l1-1-0.dll', 'api-ms-win-crt-time-l1-1-0.dll', 'api-ms-win-crt-utility-l1-1-0.dll', 'd3dcompiler_47.dll', 'libEGL.dll', 'libGLESv2.dll', 'opengl32sw.dll', 'Qt5DBus.dll', 'Qt5Network.dll', 'Qt5Qml.dll', 'Qt5Quick.dll', 'Qt5Svg.dll', 'Qt5WebSockets.dll', 'ucrtbase.dll', 'VCRUNTIME140_1.dll', 'Qt5QmlModels.dll', 'MSVCP140_1.dll']
+excluded_binaries = ['api-ms-win-core-console-l1-1-0.dll', 'api-ms-win-core-datetime-l1-1-0.dll', 'api-ms-win-core-debug-l1-1-0.dll', 'api-ms-win-core-errorhandling-l1-1-0.dll', 'api-ms-win-core-file-l1-1-0.dll', 'api-ms-win-core-file-l1-2-0.dll', 'api-ms-win-core-file-l2-1-0.dll', 'api-ms-win-core-handle-l1-1-0.dll', 'api-ms-win-core-heap-l1-1-0.dll', 'api-ms-win-core-interlocked-l1-1-0.dll', 'api-ms-win-core-libraryloader-l1-1-0.dll', 'api-ms-win-core-localization-l1-2-0.dll', 'api-ms-win-core-memory-l1-1-0.dll', 'api-ms-win-core-namedpipe-l1-1-0.dll', 'api-ms-win-core-processenvironment-l1-1-0.dll', 'api-ms-win-core-processthreads-l1-1-0.dll', 'api-ms-win-core-processthreads-l1-1-1.dll', 'api-ms-win-core-profile-l1-1-0.dll', 'api-ms-win-core-rtlsupport-l1-1-0.dll', 'api-ms-win-core-string-l1-1-0.dll', 'api-ms-win-core-synch-l1-1-0.dll', 'api-ms-win-core-synch-l1-2-0.dll', 'api-ms-win-core-sysinfo-l1-1-0.dll', 'api-ms-win-core-timezone-l1-1-0.dll', 'api-ms-win-core-util-l1-1-0.dll', 'api-ms-win-crt-conio-l1-1-0.dll', 'api-ms-win-crt-convert-l1-1-0.dll', 'api-ms-win-crt-environment-l1-1-0.dll', 'api-ms-win-crt-filesystem-l1-1-0.dll', 'api-ms-win-crt-heap-l1-1-0.dll', 'api-ms-win-crt-locale-l1-1-0.dll', 'api-ms-win-crt-math-l1-1-0.dll', 'api-ms-win-crt-multibyte-l1-1-0.dll', 'api-ms-win-crt-process-l1-1-0.dll', 'api-ms-win-crt-runtime-l1-1-0.dll', 'api-ms-win-crt-stdio-l1-1-0.dll', 'api-ms-win-crt-string-l1-1-0.dll', 'api-ms-win-crt-time-l1-1-0.dll', 'api-ms-win-crt-utility-l1-1-0.dll', 'd3dcompiler_47.dll', 'libEGL.dll', 'libGLESv2.dll', 'opengl32sw.dll', 'Qt6DBus.dll', 'Qt6Network.dll', 'Qt6Qml.dll', 'Qt6Quick.dll', 'Qt6Svg.dll', 'Qt6WebSockets.dll', 'ucrtbase.dll', 'VCRUNTIME140_1.dll', 'Qt6QmlModels.dll', 'MSVCP140_1.dll', 'Qt6OpenGL.dll', 'Qt6OpenGLWidgets.dll', 'Qt6Pdf.dll', 'QtOpenGL.pyd', 'QtOpenGLWidgets.pyd']
 
 excluded_upx = ['qwindows.dll', 'qsvgicon.dll', 'qxdgdesktopportal.dll', 'qwindowsvistastyle.dll']
 
-excluded_modules = ['tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'PIL', 'tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'matplotlib', 'IPython', 'scipy', 'eel', 'jedi', 'win32com', 'numpy', 'wcwidth', 'win32wnet', '_asyncio', '_bz2', '_decimal', '_hashlib', '_lzma', '_multiprocessing', '_overlapped', '_win32sysloader', '_cffi_backend', '_openssl', 'cryptography', 'docutils']
+excluded_modules = ['tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'PIL', 'tk', 'tcl', '_tkinter', 'tkinter', 'Tkinter', 'FixTk', 'matplotlib', 'IPython', 'scipy', 'eel', 'jedi', 'win32com', 'numpy', 'wcwidth', 'win32wnet', '_asyncio', '_bz2', '_decimal', '_hashlib', '_lzma', '_multiprocessing', '_win32sysloader', '_cffi_backend', '_openssl', 'cryptography', 'docutils', 'PyQt5', 'QtOpenGL', 'QtOpenGLWidgets']
 
 is_gui = not bool(input('Press Enter for GUI, or anything for Console: '))
 app_name = 'elmoCut'
@@ -191,8 +196,9 @@ os.system('pyinstaller tmp.spec --noconfirm')
 
 app_path = f'output\\{app_name}\\'
 
-platforms_dlls = app_path + 'PyQt5\\Qt\\plugins\\platforms\\'
-bin_dlls = app_path + 'PyQt5\\Qt\\bin\\'
+platforms_dlls = app_path + 'PyQt6\\Qt6\\plugins\\platforms\\'
+bin_dlls = app_path + 'PyQt6\\Qt6\\bin\\'
+pyd_dlls = app_path + 'PyQt6\\'
 
 ## Kill elmocut in case was running from old output folder
 os.system('taskkill /f /im elmoCut.exe')
@@ -203,10 +209,6 @@ if os.path.exists(app_path):
 
 os.makedirs('output', exist_ok=True)
 os.rename('dist\\' + app_name, app_path)
-
-# Compiling restart.c to restart.exe
-print('>>> [GCC] Compiling restart.c to restart.exe')
-os.system(f'gcc src\\tools\\restart.c -o {app_path}restart.exe')
 
 # Moving Manuf to output
 os.makedirs(app_path + 'manuf', exist_ok=True)
@@ -227,14 +229,18 @@ for dll in os.listdir(bin_dlls):
     if dll in excluded_binaries:
         os.remove(bin_dlls + dll)
 
+for dll in os.listdir(pyd_dlls):
+    if dll in excluded_binaries:
+        os.remove(pyd_dlls + dll)
+
 ## Remove un needed folders
 for rm in [
   'dist',
   'build', 
-  app_path + 'PyQt5\\Qt\\translations',
-  app_path + 'PyQt5\\Qt\\plugins\\imageformats',
-  app_path + 'PyQt5\\Qt\\plugins\\iconengines',
-  app_path + 'PyQt5\\Qt\\plugins\\generic'
+  app_path + 'PyQt6\\Qt6\\translations',
+  app_path + 'PyQt6\\Qt6\\plugins\\imageformats',
+  app_path + 'PyQt6\\Qt6\\plugins\\iconengines',
+  app_path + 'PyQt6\\Qt6\\plugins\\generic'
   ]:
     shutil.rmtree(rm)
 

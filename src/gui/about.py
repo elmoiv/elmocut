@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtGui import QPixmap
+from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtGui import QPixmap
 
 from ui.ui_about import Ui_MainWindow
 from tools.qtools import clickable

@@ -1,4 +1,5 @@
-from scapy.all import conf, get_if_list, get_windows_if_list, get_if_hwaddr
+from scapy.all import conf, get_if_list, get_if_hwaddr
+from scapy.arch.windows import get_windows_if_list
 from subprocess import check_output, CalledProcessError
 from socket import socket
 from threading import Thread

@@ -2,11 +2,11 @@ from os import path, makedirs, rename
 from json import dump, load, JSONDecodeError
 import ctypes
 import winreg
-
+import sys
+import subprocess
 from tools.utils import terminal
 from constants import *
-
-
+import os
 
 def is_admin():
     """
@@ -122,3 +122,31 @@ def remove_from_startup():
         winreg.DeleteValue(key, 'elmocut')
     except FileNotFoundError:
         pass
+
+def restart_gui_app(_app):
+    """
+    Relaunch the current executable as a new process, then forcibly
+    terminate this one. Passes --restarting so the new instance
+    tolerates a brief overlap with the old one during shutdown.
+    """
+    executable = sys.executable
+
+    args = [a for a in sys.argv if a != executable]
+    args = [executable] + args + ['--restarting']
+
+    DETACHED_PROCESS = 0x00000008
+    CREATE_NEW_PROCESS_GROUP = 0x00000200
+
+    subprocess.Popen(
+        args,
+        creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP,
+        close_fds=True,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+
+    _app.from_tray = True   # bypass minimize-to-tray on close
+    _app.close()
+
+    os._exit(0)

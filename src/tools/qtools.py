@@ -1,12 +1,12 @@
-from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QMessageBox as QMsg
-from PyQt5.QtCore import pyqtSignal, QEvent, QObject
+from PyQt6.QtGui import QColor
+from PyQt6.QtWidgets import QMessageBox as QMsg
+from PyQt6.QtCore import pyqtSignal, QEvent, QObject
 
 class Buttons:
-    CANCEL = QMsg.Cancel
-    YES    = QMsg.Yes
-    NO     = QMsg.No
-    OK     = QMsg.Ok
+    CANCEL = QMsg.StandardButton.Cancel
+    YES    = QMsg.StandardButton.Yes
+    NO     = QMsg.StandardButton.No
+    OK     = QMsg.StandardButton.Ok
 
 class MsgType:
     INFO     = QMsg.information
@@ -14,9 +14,9 @@ class MsgType:
     CRITICAL = QMsg.critical
 
 class MsgIcon:
-    INFO     = QMsg.Information
-    WARN     = QMsg.Warning
-    CRITICAL = QMsg.Critical
+    INFO     = QMsg.Icon.Information
+    WARN     = QMsg.Icon.Warning
+    CRITICAL = QMsg.Icon.Critical
 
 def colored_item(elmnt, c1, c2):
     """
@@ -35,14 +35,14 @@ def msg_box(title, text, window_icon, icon, buttons=Buttons.OK):
     msg.setWindowIcon(icon)
     msg.setIcon(window_icon)
     msg.setStandardButtons(buttons)
-    return msg.exec_()
+    return msg.exec()
 
 def clickable(widget):
     class Filter(QObject):
         clicked = pyqtSignal()
         def eventFilter(self, obj, event):
             if obj == widget and \
-               event.type() == QEvent.MouseButtonRelease and \
+               event.type() == QEvent.Type.MouseButtonRelease and \
                obj.rect().contains(event.pos()):
                     self.clicked.emit()
                     return True
