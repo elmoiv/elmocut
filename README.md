@@ -22,6 +22,11 @@
   </a>
 </p>
 <p align=center>
+  
+  <a href="https://sourceforge.net/projects/elmocut/" target="_blank">
+    <img src="https://sourceforge.net/cdn/syndication/badge_img/3324963/oss-open-source-excellence-black?achievement=oss-open-source-excellence&r=https://sourceforge.net/p/elmocut/admin/files/badges/" alt="elmoCut - Eye candy ARP spoofer for Windows | SourceForge" style="width: 120px; height: 120px;" width="120" height="120" />
+  </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://sourceforge.net/projects/elmocut/" target="_blank">
     <img src="https://sourceforge.net/cdn/syndication/badge_img/3324963/oss-community-leader-black?achievement=oss-community-choice&r=https://sourceforge.net/p/elmocut/admin/files/badges/" alt="elmoCut - Eye candy ARP spoofer for Windows | SourceForge" style="width: 120px; height: 120px;" width="120" height="120" />
   </a>
@@ -208,6 +213,7 @@ Now run: `BUILD.bat`
 * [ ] Control download and upload limit of connected devices.
 * [ ] Protect elmoCut user from other spoofers.
 * [x] ***Select between available interfaces.***
+* [x] ***Dump traffic from any device.***
 * [ ] Background live connection checker.
 * [ ] Background live devices discovery.
 * [ ] Extend scan for all subnet masks.
