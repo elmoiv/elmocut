@@ -1,3 +1,14 @@
+## [1.1.0] - 2026-07-06
+- **[NEW]** Watch URLs visited by any device in your network.
+
+<img width="368" height="400" alt="ezgif-1372f2a89b31b93d" src="https://github.com/user-attachments/assets/ebcf01e0-02c8-41bb-82e1-284375ee7e4a" />
+
+- Added check for IP forwarding on startup with force change to fix some ARP issues.
+- Updated [manuf](https://github.com/coolbho3k/manuf) MAC vendors database.
+- Migrated to Qt6.
+- Fixed duplicated killed devices after re-scan.
+- Fixed issue where last nickname saved gets replaced over the old one.
+
 ## [1.0.7] - 2023-02-22
 - **[NEW]** Decreased RAM usage by 64%.
 
