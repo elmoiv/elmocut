@@ -1,3 +1,8 @@
+## [1.1.1] - 2026-07-20
+- Fixed killing devices on isolated SSIDs/Bands.
+- Updated [manuf](https://github.com/coolbho3k/manuf) MAC vendors database.
+- Improved writing settings with thread locks.
+
 ## [1.1.0] - 2026-07-06
 - **[NEW]** Watch URLs visited by any device in your network.
 
