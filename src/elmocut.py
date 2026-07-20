@@ -38,6 +38,7 @@ if __name__ == "__main__":
         GUI.show()
         GUI.resizeEvent()
         GUI.scanner.init()
+        GUI.killer.iface = GUI.scanner.iface
         GUI.sync_ip_forwarding_state()
         GUI.scanner.flush_arp()
         GUI.scanEasy()

@@ -38,15 +38,18 @@ class UpdateThread(QThread):
 
     def __init__(self):
         QThread.__init__(self)
-        self.prompt_if_latest = True # Show "You have the latest version" msg
+        self.prompt_if_latest = True
         self.github_version = 'None'
+        self.check_failed = False
         self.url = 'https://github.com/elmoiv/elmocut/releases/latest'
 
     def run(self):
+        self.check_failed = False
         try:
-            redirect = get(self.url)
+            redirect = get(self.url, timeout=5)
             self.github_version = redirect.url.split('/')[-1]
         except Exception as e:
             print('Error at Update Thread:', e)
+            self.check_failed = True
 
         self.thread_finished.emit(True)

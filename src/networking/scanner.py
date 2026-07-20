@@ -49,10 +49,15 @@ class Scanner():
         Flush ARP cache
         """
         arp_cmd = terminal(CMD_ARP_CACHE_FLUSH)
-        # Fix: Some systems has older versions of arp.exe
-        # We use netsh instead
-        if 'The parameter is incorrect' in arp_cmd:
-            terminal(CMD_ARP_CACHE_FLUSH_NEW)
+
+        # terminal() returns None on CalledProcessError — treat that the
+        # same as the known "incorrect parameter" case and fall back.
+        needs_fallback = arp_cmd is None or 'The parameter is incorrect' in arp_cmd
+
+        if needs_fallback:
+            result = terminal(CMD_ARP_CACHE_FLUSH_NEW)
+            if result is None:
+                print('[Scanner] ARP cache flush failed via both arp.exe and netsh.')
 
     def add_me(self):
         """

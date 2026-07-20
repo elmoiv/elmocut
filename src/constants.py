@@ -39,4 +39,4 @@ CMD_ARP_CACHE = 'arp -a -N {} | findstr dynamic'.format
 CMD_ARP_CACHE_FLUSH = 'arp -d *'
 CMD_ARP_CACHE_FLUSH_NEW = 'netsh interface ip delete arpcache'
 
-VERSION = '1.1.0'
+VERSION = '1.1.1'

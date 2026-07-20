@@ -17,7 +17,8 @@ def terminal(command, shell=True, decode=True):
     try:
         cmd = check_output(command, shell=shell)
         return cmd.decode() if decode else None
-    except CalledProcessError:
+    except CalledProcessError as e:
+        print(f'[terminal] Command failed: {command!r} -> {e}')
         return None
     except UnicodeDecodeError:
         return str(cmd)

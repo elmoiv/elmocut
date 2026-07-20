@@ -3,10 +3,14 @@ from json import dump, load, JSONDecodeError
 import ctypes
 import winreg
 import sys
+import threading
 import subprocess
 from tools.utils import terminal
 from constants import *
 import os
+from os import replace as os_replace
+
+_settings_lock = threading.Lock()
 
 def is_admin():
     """
@@ -35,35 +39,57 @@ def check_documents_dir():
     if not path.exists(SETTINGS_PATH):
         export_settings()
 
+def _import_settings_unlocked():
+    """
+    Internal: read settings WITHOUT acquiring the lock.
+    Only call this from inside a block that already holds _settings_lock.
+    """
+    check_documents_dir()
+    return load(open(SETTINGS_PATH))
+
+def _export_settings_unlocked(values=None):
+    """
+    Internal: write settings WITHOUT acquiring the lock, atomically.
+    Only call this from inside a block that already holds _settings_lock.
+    """
+    keys = SETTINGS_KEYS
+    values = values if values else SETTINGS_VALS
+    json = dict(zip(keys, values))
+
+    tmp_path = SETTINGS_PATH + '.tmp'
+    with open(tmp_path, 'w') as f:
+        dump(json, f)
+    os_replace(tmp_path, SETTINGS_PATH)  # atomic on Windows (same volume)
+
 def import_settings():
     """
     Get stored settings
     """
-    check_documents_dir()
-    return load(open(SETTINGS_PATH))
+    with _settings_lock:
+        return _import_settings_unlocked()
 
 def export_settings(values=None):
     """
     Store current settings (or create new)
     """
-    keys = SETTINGS_KEYS
-    values = values if values else SETTINGS_VALS
-    json = dict(zip(keys, values))
-    dump(json, open(SETTINGS_PATH, 'w'))
+    with _settings_lock:
+        _export_settings_unlocked(values)
 
 def set_settings(key, value):
     """
-    Update certain setting item
+    Update certain setting item (single atomic read-modify-write)
     """
-    s = import_settings()
-    s[key] = value
-    export_settings(list(s.values()))
+    with _settings_lock:
+        s = _import_settings_unlocked()
+        s[key] = value
+        _export_settings_unlocked(list(s.values()))
 
 def get_settings(key):
     """
     Get certain setting item by key
     """
-    return import_settings()[key]
+    with _settings_lock:
+        return _import_settings_unlocked()[key]
 
 def repair_settings():
     """
